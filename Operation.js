@@ -5,8 +5,8 @@ const { OperationEvent } = require('./OperationEvent');
 
 class Operation {
 
-    constructor(id) {
-        this.id = id || uuidv4();
+    constructor(id = uuidv4()) {
+        this.id = id;
         this.ee = new EventEmitter();
         this.dependencies = [];
         this.completionCallback = null;
@@ -14,6 +14,7 @@ class Operation {
         this.isExecuting = false;
         this._done = false;
         this._canStart = false;
+        this.error = true;
     }
 
     done() {
@@ -29,6 +30,7 @@ class Operation {
     
     cancel() {
         this._cancelled = true;
+        Promise.resolve(this.promise);
         this.ee.emit(OperationEvent.CANCEL, this);
     }
 
@@ -44,13 +46,18 @@ class Operation {
         this.ee.off(event, cb);
     }
 
+    /**
+     * @abstract
+     * Needs to be implemented by sub-class
+     * Task to be executed
+     */
     async run() {
         console.error('must be implemented');
         return new Promise();
     }
 
     async start() {
-        if (this.isExecuting) {
+        if (this.isExecuting || this.isCancelled) {
             return;
         }
         
@@ -65,14 +72,16 @@ class Operation {
         console.log(`start: ${this.id}`);
         this.isExecuting = true;
         this.ee.emit(OperationEvent.START, this);
-        this.run()
+        this.promise = this.run()
             .then(result => {
                 this.result = result;
                 this.done();
             })
             .catch(e => {
                 this.isExecuting = false;
+                this.error = true;
                 this.ee.emit(OperationEvent.ERROR, {err:e, operation: this});
+                this.ee.emit(OperationEvent.DONE, this);
             });
     }
 
@@ -83,14 +92,6 @@ class Operation {
         }
 
         this.dependencies.forEach(operation => {
-            if (operation.id === this.id) {
-                console.warn('Operation has itself in it\'s own dependencies');
-                this._canStart = true;
-                operation.on(OperationEvent.DONE, this._onDependantOperationDone.bind(this));
-                operation.start();
-                return;
-            } 
-
             this.map[operation.id] = true;
             operation.on(OperationEvent.DONE, this._onDependantOperationDone.bind(this));
             operation.start();

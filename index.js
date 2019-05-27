@@ -3,9 +3,6 @@ const { Operation } = require('./Operation');
 const { BlockOperation } = require('./BlockOperation');
 const { OperationQueue } = require('./OperationQueue');
 
-// operation
-// operation queues
-// operation with block
 const axios = require('axios');
 
 class DownloadDataOperation extends Operation {
@@ -23,7 +20,7 @@ class DownloadDataOperation extends Operation {
 
 class TimeOutOperation extends Operation {
 
-    constructor(id, time = 1000) {
+    constructor(id = null, time = 1000) {
         super(id);
         this.time = time; 
     }
@@ -38,7 +35,7 @@ class TimeOutOperation extends Operation {
 
 }
 
-const blockOperation = new BlockOperation(6, async () => {
+const blockOperation6 = new BlockOperation(6, async () => {
     const response = await axios.get('https://samples.openweathermap.org/data/2.5/weather?lat=35&lon=139&appid=b6907d289e10d714a6e88b30761fae22');
     const data = response.data;
     return data;
@@ -52,9 +49,9 @@ const operation5 = new TimeOutOperation(5, 5000);
 
 operation.dependencies = [operation2];
 operation2.dependencies = [operation4];
-operation3.dependencies = [operation5, operation2];
-operation4.dependencies = [operation5];
-operation5.dependencies = [blockOperation];
+operation3.dependencies = [operation, operation5, operation2];
+operation4.dependencies = [operation5, blockOperation6];
+operation5.dependencies = [blockOperation6];
 
 // operation2.dependencies = [operation3];
 
@@ -73,5 +70,19 @@ operation5.dependencies = [blockOperation];
 
 const operationQueue = new OperationQueue();
 // operationQueue.addOperation(operation);
-operationQueue.addOperations([operation, operation3]);
+// operationQueue.addOperation(operation3);
+operationQueue.completionCallback = () => {
+    console.log('queue done');
+};
+
+operationQueue.addOperations([operation3])
+    .then(result => {
+        
+    })
+    .catch(e => {
+        console.log(e)
+    });
+
+
+// operation4.cancel();
 // operation.start();

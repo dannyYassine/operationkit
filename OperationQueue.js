@@ -1,44 +1,63 @@
+const { CircularOperationChecker } = require('./CircularOperationCheck');
+
 class OperationQueue {
     constructor() {
         this.map = {};
         this.operations = [];
+        this.resolve = null;
         this.completionCallback = null;
+        this.maximumConcurentOperations = null;
+        this.queue = [];
+    }
+
+    get isExecuting() {
+        return !this._isEmpty(this.map);
+    }
+
+    done() {
+        this.completionCallback && this.completionCallback();
+        this.resolve();
     }
 
     /**
      * 
      * @param {Operation} operation 
      */
-    addOperation(operation) {
-        this.operations.push(operation);
-        this._begin();
+    async addOperation(operation) {
+        if (this.isExecuting) return;
+        return this.addOperations([operation]);
     }
 
     /**
      * 
      * @param {Operation} operation 
      */
-    addOperations(operations) {
+    async addOperations(operations) {
+        if (this.isExecuting) return;
         this.operations = this.operations.concat(operations);
-        this._begin();
+        return this._begin();
     }
 
     _begin() {
-        this.operations.forEach(operation => {
-            this._createOperationMap(operation);
-            operation.start();
-        });
-    }
-
-    _createOperationMap(operation) {
-        operation.dependencies.forEach(op => {
-            this._createOperationMap(op);
+        return new Promise((resolve, reject) => {
+            try {
+                new CircularOperationChecker(this.operations);
+            } catch (e) {
+                return reject(e);
+            }
+            this.resolve = resolve;
+            
+            this.operations.forEach(operation => {
+                this.map[operation.id] = true;
+                this._startOperation(operation);
+            });
         });
     }
 
     _startOperation(operation) {
         operation.on('start', this._onOperationStart.bind(this));
-        operation.on('done', this._OnoperationDone.bind(this));
+        operation.on('cancel', this._onOperationCancel.bind(this));
+        operation.on('done', this._onOperationDone.bind(this));
         operation.start();
     }
 
@@ -46,10 +65,26 @@ class OperationQueue {
         
     }
 
-    _OnoperationDone(operation) {
-        operation.dependencies.forEach(op => {
-            this._startOperation(op);
-        })
+    _onOperationDone(operation) {
+        delete this.map[operation.id];
+        if (this._isEmpty(this.map)) {
+            this.done();
+        }
+    }
+
+    _onOperationCancel(operation) {
+        delete this.map[operation.id];
+        if (this._isEmpty(this.map)) {
+            this.done();
+        }
+    }
+
+    _isEmpty(obj) {
+        for(var key in obj) {
+            if(obj.hasOwnProperty(key))
+                return false;
+        }
+        return true;
     }
 }
 
