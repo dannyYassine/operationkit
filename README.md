@@ -1,4 +1,4 @@
-# operations.js
+# operations-js
 
 Inspried by [Operation](https://developer.apple.com/documentation/foundation/operation) and [OperationQueue](https://developer.apple.com/documentation/foundation/operationqueue) classes from the iOS Framework.
 
@@ -22,33 +22,21 @@ operation.start()
 const operationQueue = new OperationQueue();
 
 const operation1 = new BlockOperation(1, async () => {
-    return new Promise((resolve, reject) => {
-            setTimeout(() => {
-                resolve();
-            }, 1000);
-        })
+    [...]
 });
 
 const operation2 = new BlockOperation(2, async () => {
-    return new Promise((resolve, reject) => {
-            setTimeout(() => {
-                resolve();
-            }, 1000);
-        })
+    [...]
 });
 
-operation.addOperations([operation1, operation2]);
+operationQueue.addOperations([operation1, operation2]);
 ```
 
 ### Add dependencies
 
 ```
-const validateTokenOperation = new ValidateTokenOperation();
-const someApiOperation = new SomeApiOperation();
-
-someApiOperation.dependencies = [validateTokenOperation];
-
-someApiOperation.start()
+operation1.dependencies = [operation2];
+operation1.start()
 ```
 
 ### Extend the Operation class for complex tasks
@@ -74,6 +62,12 @@ const validateToken = new ValidateTokenOperation();
 const getUsersApi = new GetUsersApi();
 
 getUsersApi.dependencies = [validateToken];
+getUsersApi.completionCallback = operation => {
+    // operation.result;
+};
+getUsersApi.start()
+    .then(operation => { ... })
+    .catch(e => { ... });
 ```
 
 ### Inserting operations in a queue to control flow

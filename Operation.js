@@ -67,14 +67,15 @@ class Operation {
 
     async start() {
         if (this.isExecuting || this.isCancelled) {
-            return;
+            return this.promise;
         }
         
         if (!this._canStart) {
             try {
                 this._createMap();
             } catch (e) {
-                return;
+                // TODO always return promise
+                return;//Promise.reject(e);
             }
         }
         
@@ -92,6 +93,7 @@ class Operation {
                 this.ee.emit(OperationEvent.ERROR, {err:e, operation: this});
                 this.ee.emit(OperationEvent.DONE, this);
             });
+        return this.promise;
     }
 
     _createMap() {
