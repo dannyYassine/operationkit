@@ -45,13 +45,20 @@ const operation = new DownloadDataOperation(1);
 const operation2 = new DownloadDataOperation(2);
 const operation3 = new DownloadDataOperation(3);
 const operation4 = new TimeOutOperation(4, 2000);
-const operation5 = new TimeOutOperation(5, 5000);
+const operation5 = new TimeOutOperation(5, 1000);
+const operation7 = new TimeOutOperation(7, 8000);
+const operation8 = new TimeOutOperation(8, 1500);
 
-operation.dependencies = [operation2];
-operation2.dependencies = [operation4];
+operation.dependencies = [operation2, operation7];
+operation2.dependencies = [operation4, operation8];
 operation3.dependencies = [operation, operation5, operation2];
 operation4.dependencies = [operation5, blockOperation6];
 operation5.dependencies = [blockOperation6];
+operation8.dependencies = [operation7];
+
+blockOperation6.completionCallback = (operation) => {
+    operation5.data = operation.result;
+}
 
 // operation2.dependencies = [operation3];
 
@@ -73,16 +80,16 @@ const operationQueue = new OperationQueue();
 // operationQueue.addOperation(operation3);
 operationQueue.completionCallback = () => {
     console.log('queue done');
+    console.log(operationQueue.totalTime);
 };
 
 operationQueue.addOperations([operation3])
     .then(result => {
-        
+        console.log(result)
     })
     .catch(e => {
         console.log(e)
     });
-
 
 // operation4.cancel();
 // operation.start();

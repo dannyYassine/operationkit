@@ -13,6 +13,7 @@ class Operation {
         this.map = {};
         this.isExecuting = false;
         this._done = false;
+        this._isInQueue = false;
         this._canStart = false;
         this.error = true;
     }
@@ -20,8 +21,8 @@ class Operation {
     done() {
         console.log(`done: ${this.id}`);
         this._done = true;
+        this.completionCallback && this.completionCallback(this);
         this.ee.emit(OperationEvent.DONE, this);
-        this.completionCallback && this.completionCallback();
     }
 
     isDone() {
@@ -34,12 +35,20 @@ class Operation {
         this.ee.emit(OperationEvent.CANCEL, this);
     }
 
-    isCancelled() {
+    get isCancelled() {
         return this._cancelled;
     }
 
     on(event, cb) {
         this.ee.on(event, cb);
+    }
+
+    set isInQueue(value) {
+        this._isInQueue = value;
+    }
+
+    get isInQueue() {
+        return this._isInQueue;
     }
 
     off(event, cb) {
@@ -106,9 +115,17 @@ class Operation {
     }
 
     _tryStart() {
+        if (this.isExecuting || this.isCancelled || this._done) {
+            return;
+        }
         if (this._isEmpty(this.map)) {
+            // should emit event to let operation queue that this operation can start
+            // then it could check if maximum concurrent is not passed
             this._canStart = true;
-            this.start();
+            this.ee.emit(OperationEvent.READY, this);
+            if (!this.isInQueue) {
+                this.start();
+            }
         }
     }
 
