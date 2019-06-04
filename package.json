@@ -1,6 +1,6 @@
 {
   "name": "operation",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -9,7 +9,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "axios": "^0.18.0",
     "uuid": "^3.3.2"
+  },
+  "devDependencies": {
+    "axios": "^0.18.0"
   }
 }

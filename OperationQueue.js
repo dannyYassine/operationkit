@@ -42,7 +42,6 @@ class OperationQueue {
      * @param {Operation} operation 
      */
     async addOperation(operation) {
-        if (this.isExecuting) return;
         return this.addOperations([operation]);
     }
 
@@ -51,7 +50,6 @@ class OperationQueue {
      * @param {Operation} operation 
      */
     async addOperations(operations) {
-        if (this.isExecuting) return;
         this.operations = this.operations.concat(operations);
         this._preProcessOperations(this.operations);
         return this._begin();
