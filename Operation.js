@@ -73,6 +73,11 @@ class Operation {
         if (!this._canStart) {
             try {
                 this._createMap();
+
+                if (this._isInQueue) {
+                    this.ee.emit(OperationEvent.READY, this);
+                    return;
+                }
             } catch (e) {
                 // TODO always return promise
                 return;//Promise.reject(e);

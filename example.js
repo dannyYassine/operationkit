@@ -44,17 +44,17 @@ const blockOperation6 = new BlockOperation(6, async () => {
 const operation = new DownloadDataOperation(1);
 const operation2 = new DownloadDataOperation(2);
 const operation3 = new DownloadDataOperation(3);
-const operation4 = new TimeOutOperation(4, 2000);
+const operation4 = new TimeOutOperation(4, 1000);
 const operation5 = new TimeOutOperation(5, 1000);
-const operation7 = new TimeOutOperation(7, 8000);
-const operation8 = new TimeOutOperation(8, 1500);
+const operation7 = new TimeOutOperation(7, 1000);
+const operation8 = new TimeOutOperation(8, 1000);
 
-operation.dependencies = [operation2, operation7];
-operation2.dependencies = [operation4, operation8];
-operation3.dependencies = [operation, operation5, operation2];
-operation4.dependencies = [operation5, blockOperation6];
-operation5.dependencies = [blockOperation6];
-operation8.dependencies = [operation7];
+// operation.dependencies = [operation2, operation7];
+// operation2.dependencies = [operation4, operation8];
+// operation3.dependencies = [operation, operation5, operation2];
+// operation4.dependencies = [operation5, blockOperation6];
+// operation5.dependencies = [blockOperation6];
+// operation8.dependencies = [operation7];
 
 blockOperation6.completionCallback = (operation) => {
     operation5.data = operation.result;
@@ -76,6 +76,7 @@ blockOperation6.completionCallback = (operation) => {
 // }
 
 const operationQueue = new OperationQueue();
+operationQueue.maximumConcurentOperations = 10;
 // operationQueue.addOperation(operation);
 // operationQueue.addOperation(operation3);
 operationQueue.completionCallback = () => {
@@ -83,7 +84,7 @@ operationQueue.completionCallback = () => {
     console.log(operationQueue.totalTime);
 };
 
-operationQueue.addOperations([operation3])
+operationQueue.addOperations([operation4, operation5, operation7, operation8])
     .then(result => {
         console.log(result)
     })
