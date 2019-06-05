@@ -2,6 +2,12 @@
 
 Inspried by [Operation](https://developer.apple.com/documentation/foundation/operation) and [OperationQueue](https://developer.apple.com/documentation/foundation/operationqueue) classes from the iOS Framework.
 
+### Classes
+
+* Operation
+* BlockOperation
+* OperationQueue
+
 ### Operation
 
 ```
