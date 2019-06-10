@@ -272,21 +272,23 @@ describe('Operation', () => {
             const operation2 = new TestOperation(2);
             operation1.dependencies = [operation2];
 
+            let copyOperationState1 = null;
             operation2.completionCallback = op => {
-                expect(operation1.isExecuting).toBe(false);
-                expect(operation1.isFinished).toBe(false);
-                expect(operation1.isCancelled).toBe(false);
+                const { isCancelled, isExecuting, isFinished } = operation1;
+                copyOperationState1 = { isCancelled, isExecuting, isFinished };
             }
 
             const promise = operation1.start();
-            
-            expect(operation2.isExecuting).toBe(true);
-            expect(operation2.isFinished).toBe(false);
 
             await promise;
 
+            expect(copyOperationState1.isExecuting).toBe(false);
+            expect(copyOperationState1.isFinished).toBe(false);
+            expect(copyOperationState1.isCancelled).toBe(false);
+
             expect(operation1.isExecuting).toBe(true);
             expect(operation2.isExecuting).toBe(true);
+            
             expect(operation1.isFinished).toBe(true);
             expect(operation2.isFinished).toBe(true);
         });

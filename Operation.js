@@ -15,6 +15,7 @@ class Operation {
         this._done = false;
         this._isInQueue = false;
         this._canStart = false;
+        this._cancelled = false;
         this.error = true;
     }
 

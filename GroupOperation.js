@@ -3,17 +3,18 @@ const { OperationQueue } = require('./OperationQueue');
 
 class GroupOperation extends Operation {
 
-    /**
-     * @var {OperationQueue}
-     */
-    queue;
+    // /**
+    //  * @var {OperationQueue}
+    //  */
+    // queue;
 
-    /**
-     * @var {Array.<Operation>}
-     */
-    operations;
+    // /**
+    //  * @var {Array.<Operation>}
+    //  */
+    // operations;
 
     constructor() {
+        super();
         this.queue = new OperationQueue();    
         this.operations = [];
     }
