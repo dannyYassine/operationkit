@@ -19,13 +19,17 @@ class Operation {
     }
 
     done() {
-        console.log(`done: ${this.id}`);
         this._done = true;
         this.completionCallback && this.completionCallback(this);
         this.ee.emit(OperationEvent.DONE, this);
+        console.log(`done: ${this.id}`);
     }
 
     isDone() {
+        return this._done;
+    }
+
+    get isFinished() {
         return this._done;
     }
     
@@ -39,10 +43,6 @@ class Operation {
         return this._cancelled;
     }
 
-    on(event, cb) {
-        this.ee.on(event, cb);
-    }
-
     set isInQueue(value) {
         this._isInQueue = value;
     }
@@ -51,8 +51,20 @@ class Operation {
         return this._isInQueue;
     }
 
+    on(event, cb) {
+        this.ee.on(event, cb);
+    }
+
     off(event, cb) {
         this.ee.off(event, cb);
+    }
+
+    addDependency(dependency) {
+        this.dependencies.push(dependency);
+    }
+
+    removeDependency(dependency) {
+        this.dependencies.filter(operation => operation.id === dependency.id)
     }
 
     /**
@@ -61,8 +73,7 @@ class Operation {
      * Task to be executed
      */
     async run() {
-        console.error('must be implemented');
-        return new Promise();
+        throw new Error('run function must be implemented');
     }
 
     async start() {
@@ -91,6 +102,7 @@ class Operation {
             .then(result => {
                 this.result = result;
                 this.done();
+                return result;
             })
             .catch(e => {
                 this.isExecuting = false;
@@ -122,7 +134,7 @@ class Operation {
     }
 
     _tryStart() {
-        if (this.isExecuting || this.isCancelled || this._done) {
+        if (this.isExecuting || this.isCancelled || this.isFinished) {
             return;
         }
         if (this._isEmpty(this.map)) {

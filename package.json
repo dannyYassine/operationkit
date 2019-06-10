@@ -1,15 +1,21 @@
 {
   "name": "operations-js",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest --colors",
+    "test-recent": "jest --onlyChanged",
+    "test-last": "jest --lastCommit",
+    "test-watch": "jest --watchAll",
+    "test-coverage": "jest --coverage",
+    "test-help": "jest --help"
   },
   "author": "",
   "license": "ISC",
   "repository": "dannyYassine/operations.js",
   "dependencies": {
+    "jest": "^24.8.0",
     "uuid": "^3.3.2"
   },
   "devDependencies": {

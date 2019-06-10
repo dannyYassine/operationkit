@@ -1,6 +1,7 @@
 const { CircularOperationChecker } = require('./CircularOperationCheck');
 
 class OperationQueue {
+
     constructor() {
         this.time = {};
         this.map = {};
@@ -47,7 +48,7 @@ class OperationQueue {
 
     /**
      * 
-     * @param {Operation} operation 
+     * @param {Array.<Operation>} operations
      */
     async addOperations(operations) {
         this.operations = this.operations.concat(operations);

@@ -7,4 +7,4 @@ module.exports = {
     Operation,
     BlockOperation,
     OperationQueue
-}
+};

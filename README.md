@@ -38,11 +38,33 @@ const operation2 = new BlockOperation(2, async () => {
 operationQueue.addOperations([operation1, operation2]);
 ```
 
+### Utilizing OperationQueue's maximum concurrent operations
+
+```
+operationQueue.maximumConcurentOperations = 2;
+```
+
+Console:
+```
+// operation1 started
+// operation2 started
+// operation1 done
+// operation2 done
+```
+
 ### Add dependencies
 
 ```
 operation1.dependencies = [operation2];
 operation1.start()
+```
+
+Console:
+```
+// operation2 started
+// operation2 done
+// operation1 started
+// operation1 done
 ```
 
 ### Extend the Operation class for complex tasks
@@ -114,16 +136,6 @@ operationQueue.addOperations([operation3])
     .catch(e => {
         console.log(e)
     });
-```
-
-### Utilizing OperationQueue's maximum concurrent operations
-
-```
-operationQueue.maximumConcurentOperations = 10;
-// total time : 4.958 secondes
-
-operationQueue.maximumConcurentOperations = 1
-// total time : 6.35 secondes
 ```
 
 
