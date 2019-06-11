@@ -25,9 +25,7 @@ class GroupOperation extends Operation {
      * @returns {Promise}
      */
     run() {
-        this.dependencies = this.dependencies;
-        this.operations.push(this);
-        return this.operations.addOperations(this.operations);
+        return this.queue.addOperations(this.operations.concat([this]));
     }
 
     /**
@@ -35,6 +33,7 @@ class GroupOperation extends Operation {
      */
     addOperation(operation) {
         this.operations.push(operation);
+        this.dependencies = this.operations;
     }
 
     /**
@@ -42,6 +41,7 @@ class GroupOperation extends Operation {
      */
     addOperations(operations) {
         this.operations = this.operations.concat(operations);
+        this.dependencies = this.operations;
     }
 }
 

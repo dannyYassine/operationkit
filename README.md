@@ -7,6 +7,7 @@ Inspried by [Operation](https://developer.apple.com/documentation/foundation/ope
 * Operation
 * BlockOperation
 * OperationQueue
+* GroupOperation
 
 ### Operation
 

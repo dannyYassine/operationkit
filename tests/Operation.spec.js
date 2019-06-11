@@ -1,12 +1,7 @@
 const { OperationQueue } = require('../OperationQueue');
 const { Operation } = require('../Operation');
 const { OperationEvent } = require('../OperationEvent');
-
-class TestOperation extends Operation {
-    async run() {
-        return 'my result';
-    }
-}
+const { TestOperation } = require('./TestOperation');
 
 describe('Operation', () => {
 
@@ -288,7 +283,7 @@ describe('Operation', () => {
 
             expect(operation1.isExecuting).toBe(true);
             expect(operation2.isExecuting).toBe(true);
-            
+
             expect(operation1.isFinished).toBe(true);
             expect(operation2.isFinished).toBe(true);
         });
