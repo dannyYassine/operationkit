@@ -95,8 +95,18 @@ getUsersApi.completionCallback = operation => {
     // operation.result;
 };
 getUsersApi.start()
-    .then(operation => { ... })
+    .then(result => { ... })
     .catch(e => { ... });
+```
+
+Or set the dependency directly in the subclass:
+
+```
+class GetUsersApi extends Operation {
+    constructor() {
+        this.dependencies = [new ValidateTokenOperation()];
+    }
+}
 ```
 
 ### Inserting operations in a queue to control flow
@@ -137,6 +147,19 @@ operationQueue.addOperations([operation3])
     .catch(e => {
         console.log(e)
     });
+```
+
+### GroupOperation:
+
+Group multiple operations and return the result of each operation when they are all resolved.
+
+```
+const groupOperation = new GroupOperation();
+
+groupOperation.addOperation(new GetUsersApi());
+groupOperation.addOperation(new GetPostsApi());
+
+const [users, posts] = await groupOperation.start();
 ```
 
 
