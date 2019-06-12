@@ -87,12 +87,6 @@ class OperationQueue {
     }
 
     _startOperation(operation) {
-        // if (this.map[operation.id]) {return};
-        // this.map[operation.id] = true;
-        // operation.on('start', this._onOperationStart.bind(this));
-        // operation.on('ready', this._onOperationReady.bind(this));
-        // operation.on('cancel', this._onOperationCancel.bind(this));
-        // operation.on('done', this._onOperationDone.bind(this));
         operation.start();
     }
 

@@ -3,16 +3,6 @@ const { OperationQueue } = require('./OperationQueue');
 
 class GroupOperation extends Operation {
 
-    // /**
-    //  * @var {OperationQueue}
-    //  */
-    // queue;
-
-    // /**
-    //  * @var {Array.<Operation>}
-    //  */
-    // operations;
-
     constructor() {
         super();
         this.queue = new OperationQueue();    
@@ -25,7 +15,15 @@ class GroupOperation extends Operation {
      * @returns {Promise}
      */
     run() {
-        return this.queue.addOperations(this.operations.concat([this]));
+        return this.queue.addOperations(this.operations);
+    }
+
+    /**
+     * @override
+     */
+    start() {
+        this.dependencies = [];
+        return super.start();
     }
 
     /**
@@ -33,7 +31,7 @@ class GroupOperation extends Operation {
      */
     addOperation(operation) {
         this.operations.push(operation);
-        this.dependencies = this.operations;
+        this.dependencies = [];
     }
 
     /**
@@ -41,7 +39,7 @@ class GroupOperation extends Operation {
      */
     addOperations(operations) {
         this.operations = this.operations.concat(operations);
-        this.dependencies = this.operations;
+        this.dependencies = [];
     }
 }
 
