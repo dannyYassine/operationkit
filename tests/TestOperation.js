@@ -2,7 +2,8 @@ const { Operation } = require('../Operation');
 
 class TestOperation extends Operation {
     async run() {
-        return 'my result';
+        this.result = `my result - ${this.id}`;
+        return this.result;
     }
 }
 

@@ -64,7 +64,7 @@ describe('Operation', () => {
             try {
                 const result = await operation.start()
     
-                expect(operation.result).toBe('my result');
+                expect(operation.result).toBe(`my result - ${operation.id}`);
                 done();
             } catch (e) {
                 // failled
@@ -90,6 +90,22 @@ describe('Operation', () => {
             operation.start();
 
             expect(operation.isExecuting).toBeTruthy();
+        });
+
+        test('should try to start when ready', () => {
+            
+        });
+
+        test('should not try to start when already executing', () => {
+            
+        });
+
+        test('should not try to start when already cancelled', () => {
+            
+        });
+
+        test('should not try to start when already finished', () => {
+            
         });
     });
 
@@ -289,4 +305,41 @@ describe('Operation', () => {
         });
     });
 
+    describe('function addDependency', () => {
+        it('should add operation dependency', async () => {
+            const operation1 = new TestOperation();
+            const operation2 = new TestOperation();
+
+            operation1.addDependency(operation2);
+
+            expect(operation1.dependencies.length).toBe(1);
+            expect(operation1.dependencies[0].id).toBe(operation2.id);
+        });
+    });
+
+    describe('function removeDependency', () => {
+        it('should remove operation dependency', async () => {
+            const operation1 = new TestOperation();
+            const operation2 = new TestOperation();
+            const operation3 = new TestOperation();
+            operation1.addDependency(operation2);
+            operation1.addDependency(operation3);
+
+            operation1.removeDependency(operation2);
+
+            expect(operation1.dependencies.length).toBe(1);
+            expect(operation1.dependencies[0].id).toBe(operation3.id);
+
+            operation1.removeDependency(operation3);
+
+            expect(operation1.dependencies.length).toBe(0);
+            expect(operation1.dependencies).toEqual([]);
+        });
+    });
+
+    describe('function on', () => {
+    });
+
+    describe('function off', () => {
+    });
 });

@@ -14,14 +14,19 @@ class GroupOperation extends Operation {
      * 
      * @returns {Promise}
      */
-    run() {
-        return this.queue.addOperations(this.operations);
+    async run() {
+        await this.queue.addOperations(this.operations)
+
+        return this.operations.reduce((accum, operation) => {
+            accum.push(operation.result);
+            return accum;
+        }, []);           
     }
 
     /**
      * @override
      */
-    start() {
+    async start() {
         this.dependencies = [];
         return super.start();
     }

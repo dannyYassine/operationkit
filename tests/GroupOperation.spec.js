@@ -103,6 +103,23 @@ describe('GroupOperation', () => {
             expect(groupOperation.isExecuting).toBe(true);
             expect(groupOperation.isFinished).toBe(true);
             done();
+        });
+
+        test('groupOperation returns array of sorted results of operations', async (done) => {
+            const operation1 = new TestOperation(1);
+            const operation2 = new TestOperation(2);
+            const groupOperation = new GroupOperation();
+            
+            groupOperation.addOperation(operation1);
+            groupOperation.addOperation(operation2);
+
+            const [result1, result2] = await groupOperation.start();
+
+            console.log(result1);
+            expect(result1).toBe(operation1.result);
+            expect(result2).toBe(operation2.result);
+
+            done();
         })
     })
     

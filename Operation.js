@@ -65,7 +65,7 @@ class Operation {
     }
 
     removeDependency(dependency) {
-        this.dependencies.filter(operation => operation.id === dependency.id)
+        this.dependencies = this.dependencies.filter(operation => operation.id !== dependency.id)
     }
 
     /**
