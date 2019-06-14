@@ -2,13 +2,14 @@ const EventEmitter = require('events')
 const uuidv4 = require('uuid/v4');
 
 const { OperationEvent } = require('./OperationEvent');
+const { QueuePriority } = require('./QueuePriority');
 
 class Operation {
 
     constructor(id = uuidv4()) {
         this.id = id;
         this.ee = new EventEmitter();
-        this.dependencies = [];
+        this._dependencies = [];
         this.completionCallback = null;
         this.map = {};
         this.isExecuting = false;
@@ -17,6 +18,8 @@ class Operation {
         this._canStart = false;
         this._cancelled = false;
         this.error = true;
+        this.name = null;
+        this._queuePriority = QueuePriority.normal;
     }
 
     done() {
@@ -52,6 +55,32 @@ class Operation {
         return this._isInQueue;
     }
 
+    set queuePriority(value) {
+        if (this.isExecuting || this.isCancelled || this.isFinished) {
+            return;
+        }
+
+        if (value >= QueuePriority.veryLow && value <= QueuePriority.veryHigh) {
+            this._queuePriotity = value;
+        }
+    }
+
+    get queuePriority() {
+        return this._queuePriotity;
+    }
+
+    set dependencies(value) {
+        if (this.isExecuting || this.isCancelled || this.isFinished) {
+            return;
+        }
+
+        this._dependencies = value;
+    }
+
+    get dependencies() {
+        return JSON.parse(JSON.stringify(this._dependencies));
+    }
+
     on(event, cb) {
         this.ee.on(event, cb);
     }
@@ -61,11 +90,11 @@ class Operation {
     }
 
     addDependency(dependency) {
-        this.dependencies.push(dependency);
+        this._dependencies.push(dependency);
     }
 
     removeDependency(dependency) {
-        this.dependencies = this.dependencies.filter(operation => operation.id !== dependency.id)
+        this._dependencies = this._dependencies.filter(operation => operation.id !== dependency.id)
     }
 
     /**
@@ -115,12 +144,12 @@ class Operation {
     }
 
     _createMap() {
-        if (!this.dependencies.length) {
+        if (!this._dependencies.length) {
             this._canStart = true;
             return;
         }
 
-        this.dependencies.forEach(operation => {
+        this._dependencies.forEach(operation => {
             this.map[operation.id] = true;
             operation.on(OperationEvent.DONE, this._onDependantOperationDone.bind(this));
             operation.start();

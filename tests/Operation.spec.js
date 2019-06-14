@@ -337,6 +337,57 @@ describe('Operation', () => {
         });
     });
 
+    describe('property dependencies', () => {
+        test('should return a clone when getting dependencies', () => {
+            const operation1 = new TestOperation();
+            const operation2 = new TestOperation();
+            operation1.addDependency(operation2);
+
+            let dependencies = operation1.dependencies;
+
+            expect(dependencies).not.toBe(operation1.dependencies);
+        });
+
+        test('should set dependencies', () => {
+            const operation1 = new TestOperation();
+            const operation2 = new TestOperation();
+
+            operation1.dependencies = [operation2];
+
+            expect(operation1.dependencies).toEqual([operation2]);
+        });
+
+        test('should not set dependencies when operation is executing', () => {
+            const operation1 = new TestOperation();
+            const operation2 = new TestOperation();
+            operation1.isExecuting = true;
+
+            operation1.dependencies = [operation2];
+
+            expect(operation1.dependencies).toEqual([]);
+        });
+
+        test('should not set dependencies when operation is cancelled', () => {
+            const operation1 = new TestOperation();
+            const operation2 = new TestOperation();
+            
+            operation1.cancel();
+            operation1.dependencies = [operation2];
+
+            expect(operation1.dependencies).toEqual([]);
+        });
+
+        test('should not set dependencies when operation is finished', () => {
+            const operation1 = new TestOperation();
+            const operation2 = new TestOperation();
+
+            operation1.done()
+            operation1.dependencies = [operation2];
+
+            expect(operation1.dependencies).toEqual([]);
+        });
+    })
+
     describe('function on', () => {
     });
 

@@ -119,7 +119,7 @@ class OperationQueue {
     _checkNextOperation() {
         if (this.runningQueue.length < this.maximumConcurentOperations && this.readyQueue.length) {
             const operation = this.readyQueue.pop();
-            if (!operation.isExecuting || operation.isCancelled || !this.runningQueueMap[operation.id]) {
+            if (!operation.isExecuting || !operation.isCancelled || !this.runningQueueMap[operation.id]) {
                 this.runningQueue.push(operation);
                 operation.start();
                 this._checkNextOperation()

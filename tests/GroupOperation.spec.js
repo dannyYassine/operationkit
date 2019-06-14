@@ -115,10 +115,9 @@ describe('GroupOperation', () => {
 
             const [result1, result2] = await groupOperation.start();
 
-            console.log(result1);
             expect(result1).toBe(operation1.result);
             expect(result2).toBe(operation2.result);
-
+            
             done();
         })
     })
