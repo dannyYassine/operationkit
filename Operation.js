@@ -3,6 +3,7 @@ const uuidv4 = require('uuid/v4');
 
 const { OperationEvent } = require('./OperationEvent');
 const { QueuePriority } = require('./QueuePriority');
+const { copyArray } = require('./utils');
 
 class Operation {
 
@@ -61,12 +62,13 @@ class Operation {
         }
 
         if (value >= QueuePriority.veryLow && value <= QueuePriority.veryHigh) {
-            this._queuePriotity = value;
+            this._queuePriority = value;
         }
     }
 
     get queuePriority() {
-        return this._queuePriotity;
+        console.log(this._queuePriority);
+        return this._queuePriority;
     }
 
     set dependencies(value) {
@@ -78,7 +80,7 @@ class Operation {
     }
 
     get dependencies() {
-        return JSON.parse(JSON.stringify(this._dependencies));
+        return copyArray(this._dependencies);
     }
 
     on(event, cb) {

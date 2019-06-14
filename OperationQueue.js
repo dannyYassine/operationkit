@@ -1,4 +1,5 @@
 const { CircularOperationChecker } = require('./CircularOperationCheck');
+const { QueuePriority } = require('./QueuePriority');
 
 class OperationQueue {
 
@@ -15,6 +16,14 @@ class OperationQueue {
 
         this.runningQueueMap = {};
         this.runningQueue = [];
+
+        this.queues = {
+            [QueuePriority.veryHigh]: [],
+            [QueuePriority.high]: [],
+            [QueuePriority.normal]: [],
+            [QueuePriority.low]: [],
+            [QueuePriority.veryLow]: []
+        }
 
         this._isDone = false;
     }
@@ -59,6 +68,7 @@ class OperationQueue {
     _preProcessOperations(operations) {
         operations.forEach(op => {
             if (!this.map[op.id]) {
+                this.queues[op.queuePriority].push(op);
                 this.map[op.id] = true;
                 op.isInQueue = true;
                 op.on('start', this._onOperationStart.bind(this));
