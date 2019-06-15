@@ -1,10 +1,14 @@
 
 const { Operation } = require('./Operation');
-const { BlockOperation } = require('./BlockOperation');
 const { OperationQueue } = require('./OperationQueue');
+const { BlockOperation } = require('./BlockOperation');
+const { GroupOperation } = require('./GroupOperation');
+const { OperationEvent } = require('./OperationEvent');
 
 module.exports = {
     Operation,
+    OperationQueue,
     BlockOperation,
-    OperationQueue
+    GroupOperation,
+    OperationEvent
 };

@@ -112,6 +112,10 @@ class Operation {
         if (this.isExecuting || this.isCancelled) {
             return this.promise;
         }
+
+        let promise = new Promise(() => {
+
+        });
         
         if (!this._canStart) {
             try {

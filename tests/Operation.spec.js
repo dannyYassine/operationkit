@@ -30,6 +30,14 @@ describe('Operation', () => {
         });
     });
 
+    describe('function constructor', () => {
+        test('it should accept an ID if only a number if passed as first argument', () => {
+            const operation = new Operation(1);
+
+            expect(operation.id).toBe(1);
+        });
+    });
+
     describe('function start', function () {
 
         test('must throw error when internal run function was never implemented', async (done) => {
@@ -389,8 +397,28 @@ describe('Operation', () => {
     })
 
     describe('function on', () => {
+        test('should add callback as a subscriber', async (done) => {
+            const operation1 = new TestOperation();
+
+            operation1.on(OperationEvent.START, () => {
+                done();
+            });
+            operation1.start();
+        });
     });
 
     describe('function off', () => {
+        test('should remove callback from subscriber', async (done) => {
+            const mockFunction = jest.fn(() => {
+            });
+            const operation1 = new TestOperation();
+            operation1.on(OperationEvent.START, mockFunction);
+
+            operation1.off(OperationEvent.START, mockFunction);
+            await operation1.start();
+
+            expect(mockFunction).not.toHaveBeenCalled();
+            done();
+        });
     });
 });

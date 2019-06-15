@@ -68,7 +68,6 @@ class OperationQueue {
     _preProcessOperations(operations) {
         operations.forEach(op => {
             if (!this.map[op.id]) {
-                this.queues[op.queuePriority].push(op);
                 this.map[op.id] = true;
                 op.isInQueue = true;
                 op.on('start', this._onOperationStart.bind(this));
@@ -109,7 +108,7 @@ class OperationQueue {
             return;
         }
         this.readyQueueMap[operation.id] = true;
-        this.readyQueue.push(operation);
+        this.queues[operation.queuePriority].push(operation);
 
         this._checkNextOperation() 
     }
@@ -127,8 +126,8 @@ class OperationQueue {
     }
 
     _checkNextOperation() {
-        if (this.runningQueue.length < this.maximumConcurentOperations && this.readyQueue.length) {
-            const operation = this.readyQueue.pop();
+        if (this.runningQueue.length < this.maximumConcurentOperations && this._hasOperations()) {
+            const operation = this._getNextOperation();
             if (!operation.isExecuting || !operation.isCancelled || !this.runningQueueMap[operation.id]) {
                 this.runningQueue.push(operation);
                 operation.start();
@@ -136,6 +135,29 @@ class OperationQueue {
             }
         }
     }
+
+    _hasOperations() {
+        return !!(this.queues[QueuePriority.veryHigh].length
+        + this.queues[QueuePriority.high].length
+        + this.queues[QueuePriority.normal].length
+        + this.queues[QueuePriority.low].length
+        + this.queues[QueuePriority.veryLow].length);
+    }
+
+    _getNextOperation() {
+        if (this.queues[QueuePriority.veryHigh].length) {
+            return this.queues[QueuePriority.veryHigh].pop();
+        } else if (this.queues[QueuePriority.high].length) {
+            return this.queues[QueuePriority.high].pop();
+        } else if (this.queues[QueuePriority.normal].length) {
+            return this.queues[QueuePriority.normal].pop();
+        } else if (this.queues[QueuePriority.low].length) {
+            return this.queues[QueuePriority.low].pop();
+        } else if (this.queues[QueuePriority.veryLow].length) {
+            return this.queues[QueuePriority.veryLow].pop();
+        }
+    }
+
 
     _onOperationCancel(operation) {
         delete this.map[operation.id];
