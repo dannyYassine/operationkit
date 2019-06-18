@@ -1,9 +1,9 @@
 {
   "name": "operationkit",
-  "version": "0.1.4",
+  "version": "0.1.6",
   "description": "",
   "main": "index.js",
-  "scripts": {
+  "scripts": {  
     "test": "jest --colors",
     "test-recent": "jest --onlyChanged",
     "test-last": "jest --lastCommit",
@@ -15,10 +15,10 @@
   "license": "ISC",
   "repository": "dannyYassine/operations.js",
   "dependencies": {
-    "jest": "^24.8.0",
     "uuid": "^3.3.2"
   },
   "devDependencies": {
-    "axios": "^0.18.0"
+    "axios": "^0.18.0",
+    "jest": "^24.8.0"
   }
 }

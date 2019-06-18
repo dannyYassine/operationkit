@@ -1,71 +1,28 @@
-# operations-js
+# operationkit
 
 Inspried by [Operation](https://developer.apple.com/documentation/foundation/operation) and [OperationQueue](https://developer.apple.com/documentation/foundation/operationqueue) classes from the iOS Framework.
 
-### Classes
+## Installation
+
+```
+npm install operationkit
+```
+
+## Classes
 
 * Operation
 * BlockOperation
 * OperationQueue
 * GroupOperation
 
-### Operation
+## Operation
+
+An abstract class that represents a single task.
 
 ```
-const operation = new BlockOperation(6, async () => {
-    return new Promise((resolve, reject) => {
-            setTimeout(() => {
-                resolve();
-            }, 1000);
-        })
-});
+const operation = new Operation();
 
-operation.start()
-```
-
-### OperationQueue
-
-```
-const operationQueue = new OperationQueue();
-
-const operation1 = new BlockOperation(1, async () => {
-    [...]
-});
-
-const operation2 = new BlockOperation(2, async () => {
-    [...]
-});
-
-operationQueue.addOperations([operation1, operation2]);
-```
-
-### Utilizing OperationQueue's maximum concurrent operations
-
-```
-operationQueue.maximumConcurentOperations = 2;
-```
-
-Console:
-```
-// operation1 started
-// operation2 started
-// operation1 done
-// operation2 done
-```
-
-### Add dependencies
-
-```
-operation1.dependencies = [operation2];
-operation1.start()
-```
-
-Console:
-```
-// operation2 started
-// operation2 done
-// operation1 started
-// operation1 done
+const result = await operation.start();
 ```
 
 ### Extend the Operation class for complex tasks
@@ -82,6 +39,36 @@ class ValidateTokenOperation extends Operation {
     }
     
 }
+```
+
+### BlockOperation: A Helper Class that accepts a function
+
+```
+const operation = new BlockOperation(6, async () => {
+    return new Promise((resolve, reject) => {
+            setTimeout(() => {
+                resolve();
+            }, 1000);
+        })
+});
+
+operation.start()
+```
+
+### Add dependencies
+
+```
+operation1.dependencies = [operation2];
+operation1.start()
+```
+
+Console:
+
+```
+// operation2 started
+// operation2 done
+// operation1 started
+// operation1 done
 ```
 
 ### Create a list of complex operations that represents your application
@@ -108,6 +95,39 @@ class GetUsersApi extends Operation {
     }
 }
 ```
+
+## OperationQueue
+A queue orchestrates the execution of operations. An operation queue executes its queued Operation objects based on their priority and readiness*.
+
+```
+const operationQueue = new OperationQueue();
+
+const operation1 = new BlockOperation(1, async () => {
+    [...]
+});
+
+const operation2 = new BlockOperation(2, async () => {
+    [...]
+});
+
+operationQueue.addOperations([operation1, operation2]);
+```
+
+### Utilizing OperationQueue's maximum concurrent operations
+
+```
+operationQueue.maximumConcurentOperations = 2;
+```
+
+Console:
+
+```
+// operation1 started
+// operation2 started
+// operation1 done
+// operation2 done
+```
+
 
 ### Inserting operations in a queue to control flow
 
@@ -149,7 +169,40 @@ operationQueue.addOperations([operation3])
     });
 ```
 
-### GroupOperation:
+### Queue Priority
+
+Specify the relative ordering of operations that are waiting to be started in an operation queue.
+
+```
+QueuePriority.veryHigh
+QueuePriority.high
+QueuePriority.normal
+QueuePriority.low
+QueuePriority.veryLow
+```
+
+These constants let you prioritize the order in which operations execute:
+
+```
+const getCacheData = new getCacheDataOperation();
+getCacheData.queuePriority = QueuePriority.high;
+
+const downloaHighRestImage = new DownloaHighRestImageOperation();
+getCacheData.queuePriority = QueuePriority.normal;
+
+operationQueue.addOperations([getCacheData, downloaHighRestImage]);
+```
+
+Console:
+
+```
+// getCacheData started
+// getCacheData done
+// downloaHighRestImage started
+// downloaHighRestImage done
+```
+
+## GroupOperation
 
 Group multiple operations and return the result of each operation when they are all resolved.
 
@@ -161,5 +214,7 @@ groupOperation.addOperation(new GetPostsApi());
 
 const [users, posts] = await groupOperation.start();
 ```
+
+QueuePriorities are also considered when using GroupOperation.
 
 
