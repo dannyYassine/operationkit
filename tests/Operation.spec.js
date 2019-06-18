@@ -1,6 +1,7 @@
 const { OperationQueue } = require('../OperationQueue');
 const { Operation } = require('../Operation');
 const { OperationEvent } = require('../OperationEvent');
+const { QueuePriority } = require('../QueuePriority');
 const { TestOperation } = require('./TestOperation');
 
 describe('Operation', () => {
@@ -346,10 +347,12 @@ describe('Operation', () => {
     });
 
     describe('property dependencies', () => {
-        test('should return a clone when getting dependencies', () => {
+        test('should return a clone when getting dependencies when executing', () => {
             const operation1 = new TestOperation();
             const operation2 = new TestOperation();
             operation1.addDependency(operation2);
+
+            operation1.main();
 
             let dependencies = operation1.dependencies;
 
@@ -419,6 +422,49 @@ describe('Operation', () => {
 
             expect(mockFunction).not.toHaveBeenCalled();
             done();
+        });
+    });
+
+    describe('property queuePriority', function () {
+        test('should set valid queue priority', () => {
+            const operation = new Operation();
+
+            operation.queuePriority = QueuePriority.high;
+
+            expect(operation.queuePriority).toBe(QueuePriority.high);
+        });
+
+        test('should not set queue priority while executing', () => {
+            const operation = new Operation();
+            operation.queuePriority = QueuePriority.high;
+
+            operation.isExecuting = true;
+            operation.queuePriority = QueuePriority.normal;
+
+            expect(operation.queuePriority).toBe(QueuePriority.high);
+            expect(operation.queuePriority).not.toBe(QueuePriority.normal);
+        });
+
+        test('should not set queue priority when cancelled', () => {
+            const operation = new Operation();
+            operation.queuePriority = QueuePriority.high;
+
+            operation.cancel();
+            operation.queuePriority = QueuePriority.normal;
+
+            expect(operation.queuePriority).toBe(QueuePriority.high);
+            expect(operation.queuePriority).not.toBe(QueuePriority.normal);
+        });
+
+        test('should not set queue priority when finished', () => {
+            const operation = new Operation();
+            operation.queuePriority = QueuePriority.high;
+
+            operation.done();
+            operation.queuePriority = QueuePriority.normal;
+
+            expect(operation.queuePriority).toBe(QueuePriority.high);
+            expect(operation.queuePriority).not.toBe(QueuePriority.normal);
         });
     });
 });

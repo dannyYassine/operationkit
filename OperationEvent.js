@@ -4,7 +4,7 @@ const OperationEvent = {
     READY: 'ready',
     DONE: 'done',
     CANCEL: 'cancel',
-    ERROR: 'error'
+    ERROR: 'e'
 }
 
 module.exports = {

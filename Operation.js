@@ -7,7 +7,11 @@ const { copyArray } = require('./utils');
 
 class Operation {
 
-    constructor(id = uuidv4()) {
+    constructor(id) {
+        if (!id) {
+            id = uuidv4()
+        }
+
         this.id = id;
         this.ee = new EventEmitter();
         this._dependencies = [];
@@ -20,7 +24,12 @@ class Operation {
         this._cancelled = false;
         this.error = true;
         this.name = null;
+        this.promise = null;
+        this.runPromise = null;
         this._queuePriority = QueuePriority.normal;
+
+        this._resolve = null;
+        this._reject = null;
     }
 
     done() {
@@ -28,6 +37,7 @@ class Operation {
         this.completionCallback && this.completionCallback(this);
         this.ee.emit(OperationEvent.DONE, this);
         console.log(`done: ${this.id}`);
+        this._resolve && this._resolve(this.result);
     }
 
     isDone() {
@@ -42,6 +52,7 @@ class Operation {
         this._cancelled = true;
         Promise.resolve(this.promise);
         this.ee.emit(OperationEvent.CANCEL, this);
+        this._resolve && this._resolve();
     }
 
     get isCancelled() {
@@ -61,13 +72,12 @@ class Operation {
             return;
         }
 
-        if (value >= QueuePriority.veryLow && value <= QueuePriority.veryHigh) {
+        if (QueuePriority.isValid(value)) {
             this._queuePriority = value;
         }
     }
 
     get queuePriority() {
-        console.log(this._queuePriority);
         return this._queuePriority;
     }
 
@@ -80,7 +90,10 @@ class Operation {
     }
 
     get dependencies() {
-        return copyArray(this._dependencies);
+        if (this.isExecuting || this.isCancelled || this.isFinished) {
+            return copyArray(this._dependencies);
+        }
+        return this._dependencies;
     }
 
     on(event, cb) {
@@ -108,45 +121,54 @@ class Operation {
         throw new Error('run function must be implemented');
     }
 
-    async start() {
-        if (this.isExecuting || this.isCancelled) {
-            return this.promise;
-        }
-
-        let promise = new Promise(() => {
-
-        });
-        
-        if (!this._canStart) {
-            try {
-                this._createMap();
-
-                if (this._isInQueue) {
-                    this.ee.emit(OperationEvent.READY, this);
-                    return;
-                }
-            } catch (e) {
-                // TODO always return promise
-                return;//Promise.reject(e);
-            }
-        }
-        
-        console.log(`start: ${this.id}`);
+    main() {
         this.isExecuting = true;
         this.ee.emit(OperationEvent.START, this);
-        this.promise = this.run()
+        this.runPromise = this.run()
             .then(result => {
                 this.result = result;
                 this.done();
-                return result;
             })
             .catch(e => {
                 this.isExecuting = false;
                 this.error = true;
-                this.ee.emit(OperationEvent.ERROR, {err:e, operation: this});
+                this.ee.emit(OperationEvent.ERROR, {err: e, operation: this});
                 this.ee.emit(OperationEvent.DONE, this);
+                this._reject && this._reject();
             });
+    }
+
+    start() {
+        if (this.isExecuting || this.isCancelled || this.isFinished) {
+            return this.promise;
+        } else if (this.promise && !this._canStart) {
+            this._preProcessStart();
+        } else if (this.promise && this._canStart) {
+            if (this._isInQueue) {
+                this.ee.emit(OperationEvent.READY, this);
+            } else {
+                this.main();
+            }
+        } else {
+            this.promise = new Promise((resolve, reject) => {
+                this._resolve = resolve;
+                this._reject = reject;
+                this._preProcessStart();
+            });
+        }
         return this.promise;
+    }
+
+    _preProcessStart() {
+        this._createMap();
+
+        if (this._canStart) {
+            if (this._isInQueue) {
+                this.ee.emit(OperationEvent.READY, this);
+            } else {
+                this.main();
+            }
+        }
     }
 
     _createMap() {
@@ -161,7 +183,6 @@ class Operation {
             operation.start();
         });
 
-        throw new Error();
     }
 
     _onDependantOperationDone(operation) {
@@ -177,8 +198,9 @@ class Operation {
             // should emit event to let operation queue that this operation can start
             // then it could check if maximum concurrent is not passed
             this._canStart = true;
-            this.ee.emit(OperationEvent.READY, this);
-            if (!this.isInQueue) {
+            if (this.isInQueue) {
+                this.ee.emit(OperationEvent.READY, this);
+            } else {
                 this.start();
             }
         }

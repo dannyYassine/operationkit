@@ -50,6 +50,56 @@ describe('OperationQueue', () => {
         })
     });
 
+    describe('function pause', function () {
+        test('should set/get property isPaused', () => {
+            const operationQueue = new OperationQueue();
+
+            operationQueue.pause();
+
+            expect(operationQueue.isPaused).toEqual(true);
+        });
+
+        test('should not start any newly added opeations when queue is paused', () => {
+            const operationQueue = new OperationQueue();
+            const operation1 = new TestOperation();
+
+            operationQueue.pause();
+            operationQueue.addOperation(operation1);
+
+            expect(operationQueue.runningQueue.length).toBe(0);
+        });
+    });
+
+    describe('function resume', function () {
+        test('should un-set/get property isPaused', () => {
+            const operationQueue = new OperationQueue();
+
+            operationQueue.pause();
+            operationQueue.resume();
+
+            expect(operationQueue.isPaused).toEqual(false);
+        });
+
+        test('should start opeations when queue is un-paused', () => {
+            const operationQueue = new OperationQueue();
+            const operation1 = new TestOperation();
+            const operation2 = new TestOperation();
+
+            operationQueue.addOperation(operation1);
+            operationQueue.pause();
+
+            expect(operationQueue.runningQueue.length).toBe(1);
+
+            operationQueue.addOperation(operation2);
+
+            expect(operationQueue.runningQueue.length).toBe(1);
+
+            operationQueue.resume();
+
+            expect(operationQueue.runningQueue.length).toBe(2);
+        });
+    });
+
     describe('adding operations while queue is still executing', () => {
         
     });

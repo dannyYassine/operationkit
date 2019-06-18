@@ -65,6 +65,19 @@ class OperationQueue {
         return this._begin();
     }
 
+    pause() {
+        this._paused = true;
+    }
+
+    resume() {
+        this._paused = false;
+        this._checkNextOperation();
+    }
+
+    get isPaused() {
+        return this._paused;
+    }
+
     _preProcessOperations(operations) {
         operations.forEach(op => {
             if (!this.map[op.id]) {
@@ -117,6 +130,7 @@ class OperationQueue {
         this.runningQueue = this.runningQueue.filter(op => op.id !== operation.id);
 
         delete this.map[operation.id];
+        delete this.runningQueueMap[operation.id];
 
         if (this._isEmpty(this.map)) {
             this.done();
@@ -126,11 +140,16 @@ class OperationQueue {
     }
 
     _checkNextOperation() {
+        if (this._paused) {
+            return;
+        }
+
         if (this.runningQueue.length < this.maximumConcurentOperations && this._hasOperations()) {
             const operation = this._getNextOperation();
             if (!operation.isExecuting || !operation.isCancelled || !this.runningQueueMap[operation.id]) {
+                this.runningQueueMap[operation.id] = true;
                 this.runningQueue.push(operation);
-                operation.start();
+                operation.main();
                 this._checkNextOperation()
             }
         }
