@@ -1,4 +1,4 @@
-const { GroupOperation } = require('../GroupOperation');
+const { GroupOperation } = require('../src/GroupOperation');
 const { TestOperation } = require('./TestOperation');
 
 describe('GroupOperation', () => {
@@ -117,7 +117,7 @@ describe('GroupOperation', () => {
 
             expect(result1).toBe(operation1.result);
             expect(result2).toBe(operation2.result);
-            
+
             done();
         })
     })

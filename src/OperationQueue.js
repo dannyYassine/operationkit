@@ -93,18 +93,28 @@ class OperationQueue {
     }
 
     _begin() {
-        return new Promise((resolve, reject) => {
-            try {
-                new CircularOperationChecker(this.operations);
-            } catch (e) {
-                return reject(e);
-            }
-            this.time.start = new Date();
-            this.resolve = resolve;
-            
-            this.operations.forEach(operation => {
-                this._startOperation(operation);
+        if (this.promise) {
+            this._startOperations();
+        } else {
+            this.promise = new Promise((resolve, reject) => {
+                try {
+                    new CircularOperationChecker(this.operations);
+                } catch (e) {
+                    return reject(e);
+                }
+                this.time.start = new Date();
+                this.resolve = resolve;
+                
+                this._startOperations();
             });
+        }
+
+        return this.promise;
+    }
+
+    _startOperations() {
+        this.operations.forEach(operation => {
+            this._startOperation(operation);
         });
     }
 

@@ -1,4 +1,4 @@
-const { OperationQueue } = require('../OperationQueue');
+const { OperationQueue } = require('../src/OperationQueue');
 const { TestOperation } = require('./TestOperation');
 
 describe('OperationQueue', () => {
@@ -28,18 +28,18 @@ describe('OperationQueue', () => {
     });
 
     describe('function addOperation', () => {
-        test('should add a single operation to its operations', () => {
+        test('should add a single operation to its operations prop', () => {
             const operationQueue = new OperationQueue(1);
             const operation1 = new TestOperation();
 
             operationQueue.addOperation(operation1);
 
             expect(operationQueue.operations).toEqual([operation1]);
-        })
+        });
     });
   
     describe('function addOperations', () => {
-        test('should multiple operations to its operations', () => {
+        test('should add multiple operations to its operations prop', () => {
             const operationQueue = new OperationQueue(1);
             const operation1 = new TestOperation();
             const operation2 = new TestOperation();
@@ -101,6 +101,16 @@ describe('OperationQueue', () => {
     });
 
     describe('adding operations while queue is still executing', () => {
-        
+        test('should add operations seperatly, at any given time', () => {
+            const operationQueue = new OperationQueue();
+            const operation1 = new TestOperation();
+            const operation2 = new TestOperation();
+
+            operationQueue.addOperation(operation1);
+            expect(operationQueue.runningQueue.length).toBe(1);
+
+            operationQueue.addOperations([operation2]);
+            expect(operationQueue.runningQueue.length).toBe(2);
+        });
     });
 })

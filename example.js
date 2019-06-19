@@ -1,7 +1,7 @@
 
-const { Operation } = require('./Operation');
-const { BlockOperation } = require('./BlockOperation');
-const { OperationQueue } = require('./OperationQueue');
+const { Operation } = require('./src/Operation');
+const { BlockOperation } = require('./src/BlockOperation');
+const { OperationQueue } = require('./src/OperationQueue');
 
 const axios = require('axios');
 
@@ -25,7 +25,7 @@ class TimeOutOperation extends Operation {
         this.time = time; 
     }
 
-    async run() {
+    run() {
         return new Promise((resolve, reject) => {
             setTimeout(() => {
                 resolve();
@@ -49,7 +49,7 @@ const operation5 = new TimeOutOperation(5, 1000);
 const operation7 = new TimeOutOperation(7, 1000);
 const operation8 = new TimeOutOperation(8, 1000);
 
-// operation.dependencies = [operation2, operation7];
+operation.dependencies = [operation2, operation7];
 // operation2.dependencies = [operation4, operation8];
 // operation3.dependencies = [operation, operation5, operation2];
 // operation4.dependencies = [operation5, blockOperation6];
@@ -79,18 +79,21 @@ const operationQueue = new OperationQueue();
 operationQueue.maximumConcurentOperations = 10;
 // operationQueue.addOperation(operation);
 // operationQueue.addOperation(operation3);
-operationQueue.completionCallback = () => {
-    console.log('queue done');
-    console.log(operationQueue.totalTime);
-};
-
-operationQueue.addOperations([operation4, operation5, operation7, operation8])
-    .then(result => {
-        console.log(result)
-    })
-    .catch(e => {
-        console.log(e)
-    });
+// operationQueue.completionCallback = () => {
+//     console.log('queue done');
+//     console.log(operationQueue.totalTime);
+// };
+(new Operation()).start().catch(e => {});
+// operationQueue.addOperations([operation4, operation5, operation7, operation8])
+//     .then(result => {
+//         console.log(result)
+//     })
+//     .catch(e => {
+//         console.log(e)
+//     });
 
 // operation4.cancel();
-// operation.start();
+// operation.start()
+//     .then(() => {
+//         console.log('123');
+//     });

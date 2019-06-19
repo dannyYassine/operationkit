@@ -1,4 +1,4 @@
-const { BlockOperation } = require('../BlockOperation');
+const { BlockOperation } = require('../src/BlockOperation');
 
 describe('BlockOperation', () => {
 

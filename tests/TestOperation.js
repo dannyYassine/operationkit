@@ -1,4 +1,4 @@
-const { Operation } = require('../Operation');
+const { Operation } = require('../src/Operation');
 
 class TestOperation extends Operation {
     async run() {
