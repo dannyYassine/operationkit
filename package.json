@@ -1,6 +1,6 @@
 {
-  "name": "operation-kit",
-  "version": "0.1.11",
+  "name": "operationkit",
+  "version": "0.1.0",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -14,7 +14,7 @@
   },
   "author": "",
   "license": "ISC",
-  "repository": "dannyYassine/operation-kit",
+  "repository": "dannyYassine/operationkit",
   "dependencies": {
     "uuid": "^3.3.2"
   },
