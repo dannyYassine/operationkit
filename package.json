@@ -8,7 +8,7 @@
     "test-recent": "jest --onlyChanged",
     "test-last": "jest --lastCommit",
     "test-watch": "jest --watchAll",
-    "test-coverage": "jest --colors --coverage",
+    "test-coverage": "jest --coverage",
     "test-help": "jest --help",
     "build": "webpack --config webpack.config.js --colors --progress",
     "coveralls": "cat ./coverage/lcov.info | node node_modules/.bin/coveralls"
