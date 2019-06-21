@@ -1,6 +1,8 @@
 const { OperationQueue } = require('../src/OperationQueue');
 const { QueueEvent } = require('../src/QueueEvent');
 const { TestOperation, TimeOutOperation } = require('./TestOperation');
+const { QueuePriority } = require('../src/QueuePriority');
+const { OperationEvent } = require('../src/OperationEvent');
 const { delay, nextTick } = require('./utils');
 
 describe('OperationQueue', () => {
@@ -116,7 +118,7 @@ describe('OperationQueue', () => {
         });
     });
 
-    describe('function start', () => {
+    describe('function addOperation/addOperations', () => {
         test('properties before calling start', () => {
             const operationQueue = new OperationQueue();
 
@@ -198,6 +200,61 @@ describe('OperationQueue', () => {
             await nextTick();
 
             expect(doneFn).toHaveBeenCalledTimes(1);
-        })
+        });
+
+        test('should set order queue priority of operations', (done) => {
+            const operationQueue = new OperationQueue();
+            operationQueue.maximumConcurentOperations = 1;
+
+            const operation1 = new TestOperation();
+            operation1.queuePriority = QueuePriority.veryHigh;
+            const operation2 = new TestOperation();
+            operation2.queuePriority = QueuePriority.high;
+            const operation3 = new TestOperation();
+            operation3.queuePriority = QueuePriority.normal;
+            const operation4 = new TestOperation();
+            operation4.queuePriority = QueuePriority.low;
+            const operation5 = new TestOperation();
+            operation5.queuePriority = QueuePriority.veryLow;
+
+            const doneOperations = [];
+            operation1.on(OperationEvent.DONE, () => {
+                console.log(doneOperations.length);
+                doneOperations.push(operation1);
+            });
+            operation2.on(OperationEvent.DONE, () => {
+                console.log(doneOperations.length);
+                doneOperations.push(operation2);
+            });
+            operation3.on(OperationEvent.DONE, () => {
+                console.log(doneOperations.length);
+                doneOperations.push(operation3);
+            });
+            operation4.on(OperationEvent.DONE, () => {
+                console.log(doneOperations.length);
+                doneOperations.push(operation4);
+            });
+            operation5.on(OperationEvent.DONE, () => {
+                console.log(doneOperations.length);
+                doneOperations.push(operation5);
+            });
+
+            operationQueue.addOperations([
+                operation2,
+                operation1,
+                operation4,
+                operation5,
+                operation3
+            ]);
+            
+            operationQueue.on(QueueEvent.DONE, () => {
+                expect(doneOperations[0] === operation1);
+                expect(doneOperations[1] === operation2);
+                expect(doneOperations[2] === operation3);
+                expect(doneOperations[3] === operation4);
+                expect(doneOperations[4] === operation5);
+                done();
+            });
+        });
     });
 })
