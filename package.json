@@ -1,6 +1,6 @@
 {
   "name": "operationkit",
-  "version": "0.1.0",
+  "version": "0.1.12",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -8,9 +8,10 @@
     "test-recent": "jest --onlyChanged",
     "test-last": "jest --lastCommit",
     "test-watch": "jest --watchAll",
-    "test-coverage": "jest --coverage",
+    "test-coverage": "jest --colors --coverage",
     "test-help": "jest --help",
-    "build": "webpack --config webpack.config.js --colors --progress "
+    "build": "webpack --config webpack.config.js --colors --progress",
+    "coveralls": "cat ./coverage/lcov.info | node node_modules/.bin/coveralls"
   },
   "author": "",
   "license": "ISC",
@@ -20,6 +21,7 @@
   },
   "devDependencies": {
     "axios": ">=0.18.1",
+    "coveralls": "^3.0.4",
     "jest": "^24.8.0",
     "webpack": "^4.34.0",
     "webpack-cli": "^3.3.4"

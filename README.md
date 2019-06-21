@@ -5,7 +5,7 @@ Inspried by [Operation](https://developer.apple.com/documentation/foundation/ope
 ## Installation
 
 ```
-npm install operation-kit
+npm install operationkit
 ```
 
 ## Classes
