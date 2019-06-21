@@ -43,20 +43,6 @@ class ValidateTokenOperation extends Operation {
 }
 ```
 
-### BlockOperation: A Helper Class that accepts a function
-
-```
-const operation = new BlockOperation(6, async () => {
-    return new Promise((resolve, reject) => {
-            setTimeout(() => {
-                resolve();
-            }, 1000);
-        })
-});
-
-operation.start()
-```
-
 ### Add dependencies
 
 ```
@@ -202,6 +188,20 @@ Console:
 // getCacheData done
 // downloaHighRestImage started
 // downloaHighRestImage done
+```
+
+## BlockOperation: A Helper Class that accepts a function
+
+```
+const operation = new BlockOperation(6, async () => {
+    return new Promise((resolve, reject) => {
+            setTimeout(() => {
+                resolve();
+            }, 1000);
+        })
+});
+
+operation.start()
 ```
 
 ## GroupOperation
