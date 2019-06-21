@@ -1,5 +1,7 @@
 # operationkit
 
+[![Coverage Status](https://coveralls.io/repos/github/dannyYassine/operationkit/badge.svg?branch=master)](https://coveralls.io/github/dannyYassine/operationkit?branch=master)
+
 Inspried by [Operation](https://developer.apple.com/documentation/foundation/operation) and [OperationQueue](https://developer.apple.com/documentation/foundation/operationqueue) classes from the iOS Framework.
 
 ## Installation
