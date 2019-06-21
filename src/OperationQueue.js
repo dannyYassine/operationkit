@@ -1,5 +1,5 @@
 const EventEmitter = require('events')
-const { CircularOperationChecker } = require('./CircularOperationCheck');
+const { CircularOperationValidator } = require('./CircularOperationValidator');
 const { QueuePriority } = require('./QueuePriority');
 const { QueueEvent } = require('./QueueEvent');
 
@@ -122,7 +122,7 @@ class OperationQueue {
         } else {
             this.promise = new Promise((resolve, reject) => {
                 try {
-                    new CircularOperationChecker(this._processedOperations);
+                    new CircularOperationValidator(this._processedOperations);
                 } catch (e) {
                     return reject(e);
                 }

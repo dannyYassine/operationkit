@@ -1,12 +1,12 @@
 
-class CircularOperationError extends Error {
+class CircularOperationValidatorError extends Error {
     constructor(message = 'Circular dependency') {
         super()
         this.message = message;
     }
 }
 
-class CircularOperationChecker {
+class CircularOperationValidator {
 
     constructor(operations) {
         this.operations = operations
@@ -40,7 +40,7 @@ class CircularOperationChecker {
         map[op.id] = Object.keys(map).length;
     }
 
-    _throwError() {
+    _throwError(op, map) {
         let keys = Object.keys(map);
 
             let values = {};
@@ -51,11 +51,11 @@ class CircularOperationChecker {
 
             values = Object.values(values);
             values.push(op.id);
-            throw new CircularOperationError(`Circular: ${values}`);
+            throw new CircularOperationValidatorError(`Circular: ${values}`);
     }
 
 }
 
 module.exports = {
-    CircularOperationChecker
+    CircularOperationValidator
 }
