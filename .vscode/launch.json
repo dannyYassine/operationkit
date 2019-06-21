@@ -8,7 +8,7 @@
             "type": "node",
             "request": "launch",
             "name": "Examples",
-            "program": "${workspaceFolder}/examples/OperationQueue.js"
+            "program": "${workspaceFolder}/src/examples/OperationQueue.js"
         },
         {
             "type": "node",

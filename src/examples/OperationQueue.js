@@ -17,8 +17,11 @@ operation1 = new TimeOutOperation();
 operation1.queuePriority = QueuePriority.low;
 operation2 = new TimeOutOperation();
 operation1.queuePriority = QueuePriority.veryHigh;
-queue.addOperations([operation1, operation2])
-    .then(() => {
-        console.log('done');
-    });;
+
+queue.on('done', () => {
+    console.log('done');
+})
+
+queue.addOperation(operation1);
+queue.addOperation(operation2);
 

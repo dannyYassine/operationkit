@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "core-js": "^2.6.5",
-    "operationkit": "^0.1.8",
+    "operationkit": "^0.1.11",
     "vue": "^2.6.10"
   },
   "devDependencies": {

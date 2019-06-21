@@ -1,5 +1,20 @@
 <template>
+    <div>
+        <div>Operation 1</div>
+        <div>Is executing: {{groupOperation.isExecuting ? true : false}}</div>
+        <div>Is finished: {{groupOperation.isFinished ? true : false}}</div>
 
+        <div>Operation 2</div>
+        <div>Is executing: {{groupOperation2.isExecuting ? true : false}}</div>
+        <div>Is finished: {{groupOperation2.isFinished ? true : false}}</div>
+
+        <div>Operation 3</div>
+        <div>Is executing: {{groupOperation3.isExecuting ? true : false}}</div>
+        <div>Is finished: {{groupOperation3.isFinished ? true : false}}</div>
+
+        <div>Operation Queue</div>
+        <div>Is executing: {{queue.isExecuting ? true : false}}</div>
+    </div>
 </template>
 <script>
 import { Operation, BlockOperation, OperationQueue, QueuePriority } from 'operationkit';
@@ -8,21 +23,56 @@ export default {
   name: 'operation',
   data() {
       return {
-          queue: new OperationQueue()
+          queue: new OperationQueue(),
+          groupOperation: null,
+          groupOperation2: null,
+          groupOperation3: null
       }
   },
   created() {
-      const groupOperation = new BlockOperation(async () => {
-          console.log('hello');
-      });
-      groupOperation.queuePriority = QueuePriority.veryHigh;
+      this.queue.maximumConcurentOperations = 1;
 
-      const groupOperation2 = new BlockOperation(async () => {
-          console.log('world');
+      this.groupOperation = new BlockOperation(1, () => {
+          return new Promise((resolve, reject) => {
+              setTimeout(() => {
+                console.log('hello');
+                resolve();
+              }, 1000);
+          })
       });
-      groupOperation.queuePriority = QueuePriority.low;
+      this.groupOperation.queuePriority = QueuePriority.veryHigh;
 
-      this.queue.addOperations([groupOperation, groupOperation2]);
+      this.groupOperation2 = new BlockOperation(2, () => {
+          return new Promise((resolve, reject) => {
+              setTimeout(() => {
+                console.log('world');
+                resolve();
+              }, 500);
+          })
+      });
+      this.groupOperation.queuePriority = QueuePriority.high;
+
+      this.groupOperation3 = new BlockOperation(3, () => {
+            return new Promise((resolve, reject) => {
+              setTimeout(() => {
+                console.log('!!!');
+                resolve();
+              }, 1000);
+          });
+});
+      this.groupOperation3.queuePriority = QueuePriority.low;
+
+      this.queue.addOperations([this.groupOperation, this.groupOperation2])
+      .then(() => {
+          console.log('done');
+      });
+      this.queue.completionCallback = () => {
+          console.log('done');
+      }
+
+      setTimeout(() => {
+          this.queue.addOperation(this.groupOperation3);
+      }, 1000);
   }
 }
 </script>

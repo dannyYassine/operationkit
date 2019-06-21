@@ -1,5 +1,7 @@
 const { OperationQueue } = require('../src/OperationQueue');
-const { TestOperation } = require('./TestOperation');
+const { QueueEvent } = require('../src/QueueEvent');
+const { TestOperation, TimeOutOperation } = require('./TestOperation');
+const { delay, nextTick } = require('./utils');
 
 describe('OperationQueue', () => {
 
@@ -112,5 +114,90 @@ describe('OperationQueue', () => {
             operationQueue.addOperations([operation2]);
             expect(operationQueue.runningQueue.length).toBe(2);
         });
+    });
+
+    describe('function start', () => {
+        test('properties before calling start', () => {
+            const operationQueue = new OperationQueue();
+
+            expect(operationQueue.isExecuting).toBe(false);
+        });
+
+        test('properties while running operations', () => {
+            const operationQueue = new OperationQueue();
+            const operation1 = new TimeOutOperation(500);
+
+            operationQueue.addOperation(operation1)
+            
+            expect(operationQueue.isExecuting).toBe(true);
+        });
+
+        test('properties after running operations', async () => {
+            const operationQueue = new OperationQueue();
+            const operation1 = new TestOperation();
+
+            operationQueue.addOperation(operation1)
+            await delay(500);
+
+            expect(operationQueue.isExecuting).toBe(false);
+        });
+
+        test('properties after running multiple operations', async (done) => {
+            const operationQueue = new OperationQueue();
+            const operation1 = new TestOperation();
+            const operation2 = new TimeOutOperation(500);
+
+            operationQueue.addOperation(operation1)
+            await nextTick();
+            operationQueue.addOperation(operation2)
+
+            operationQueue.on(QueueEvent.DONE, () => {
+                expect(operationQueue.isExecuting).toBe(false);
+                done();      
+            })
+        
+        });
+
+        test('should call done event when queue becomes empty', async (done) => {
+            const operationQueue = new OperationQueue();
+            const operation1 = new TestOperation();
+            const doneFn = jest.fn(() => {
+                done();
+            });
+            operationQueue.on(QueueEvent.DONE, doneFn);
+
+            operationQueue.addOperation(operation1);
+
+            await nextTick();
+
+            expect(doneFn).toHaveBeenCalledTimes(1);
+        });
+
+        test('should call done once event when queue becomes empty', async () => {
+            const operationQueue = new OperationQueue();
+            const operation1 = new TestOperation();
+            const doneFn = jest.fn(() => {
+            });
+            operationQueue.on(QueueEvent.DONE, doneFn);
+
+            operationQueue.addOperation(operation1);
+        });
+        
+        test('should call promise resolve when operations are re-added', async () => {
+            const operationQueue = new OperationQueue();
+            const operation1 = new TestOperation();
+            const operation2 = new TestOperation();
+            const doneFn = jest.fn(() => {
+            });
+
+            operationQueue.on(QueueEvent.DONE, doneFn);
+
+            operationQueue.addOperation(operation1);
+            operationQueue.addOperation(operation2)
+            
+            await nextTick();
+
+            expect(doneFn).toHaveBeenCalledTimes(1);
+        })
     });
 })

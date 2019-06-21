@@ -36,7 +36,6 @@ class Operation {
         this._done = true;
         this.completionCallback && this.completionCallback(this);
         this.ee.emit(OperationEvent.DONE, this);
-        console.log(`done: ${this.id}`);
         this._resolve && this._resolve(this.result);
     }
 
