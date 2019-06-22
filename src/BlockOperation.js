@@ -15,6 +15,8 @@ class BlockOperation extends Operation {
             }
         } else if (typeof first === 'function') {
             block = first;
+        } else {
+            throw new Error('Wrong arguments passed: missing ID and/or function');
         }
         
         super(id);
