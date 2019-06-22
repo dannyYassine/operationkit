@@ -5,7 +5,7 @@ node_js:
 script:  
   - npm install
   - npm run build
-    if: branch = master AND type = push
+    if: (branch = master) AND (type = push)
   - npm run test-coverage
 
 after_success:
