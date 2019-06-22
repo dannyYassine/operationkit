@@ -4,8 +4,7 @@ node_js:
 
 script:  
   - npm install
-  -
-    if: branch = master AND type = push
+  - if: branch = master AND type = push
     npm run build
   - npm run test-coverage
 
