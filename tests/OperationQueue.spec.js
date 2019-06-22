@@ -72,6 +72,47 @@ describe('OperationQueue', () => {
 
             expect(operationQueue.runningQueue.length).toBe(0);
         });
+
+        test('should emit paused event', () => {
+            const pausedFunction = jest.fn(() => {
+            });
+            const operationQueue = new OperationQueue();
+            operationQueue.on(QueueEvent.PAUSED, pausedFunction)
+
+            operationQueue.pause();
+            
+            expect(pausedFunction).toHaveBeenCalled();
+        });
+
+        test('should emit paused event only once', () => {
+            const pausedFunction = jest.fn(() => {
+            });
+            const operationQueue = new OperationQueue();
+            operationQueue.on(QueueEvent.PAUSED, pausedFunction)
+
+            operationQueue.pause();
+            operationQueue.pause();
+            operationQueue.pause();
+            operationQueue.pause();
+
+            expect(pausedFunction).toHaveBeenCalledTimes(1);
+        });
+    });
+
+    describe('function off', () => {
+        test('should remove callback from subscriber', async (done) => {
+            const mockFunction = jest.fn(() => {
+            });
+            const operationQueue = new OperationQueue();
+
+            operationQueue.on(OperationEvent.START, mockFunction);
+            operationQueue.off(OperationEvent.START, mockFunction);
+            operationQueue.pause();
+            await nextTick();
+
+            expect(mockFunction).not.toHaveBeenCalled();
+            done();
+        });
     });
 
     describe('function resume', function () {
@@ -102,6 +143,31 @@ describe('OperationQueue', () => {
 
             expect(operationQueue.runningQueue.length).toBe(2);
         });
+
+        test('should emit resumed event', () => {
+            const resumedFunction = jest.fn(() => {
+            });
+            const operationQueue = new OperationQueue();
+            operationQueue.on(QueueEvent.RESUMED, resumedFunction)
+            operationQueue.pause();
+            
+            operationQueue.resume();
+
+            expect(resumedFunction).toHaveBeenCalled();
+        });
+
+        test('should emit resumed event only once', () => {
+            const resumedFunction = jest.fn(() => {
+            });
+            const operationQueue = new OperationQueue();
+            operationQueue.on(QueueEvent.PAUSED, resumedFunction)
+            operationQueue.pause();
+
+            operationQueue.resume();
+            operationQueue.resume();
+
+            expect(resumedFunction).toHaveBeenCalledTimes(1);
+        });
     });
 
     describe('adding operations while queue is still executing', () => {
@@ -119,6 +185,25 @@ describe('OperationQueue', () => {
     });
 
     describe('function addOperation/addOperations', () => {
+        test('should throw error when operation are dependent form each other', async (done) => {
+            const operationQueue = new OperationQueue();
+            const operation1 = new TestOperation();
+            const operation2 = new TestOperation();
+            
+            operation1.dependencies = [operation2];
+            operation2.dependencies = [operation1];
+
+            try {
+                operationQueue.addOperation(operation1);
+                await nextTick();
+                fail('should have failed');
+            } catch (e) {
+                console.log(e);
+                expect(e.constructor.name === 'CircularOperationValidatorError').toBe(true);
+                done();
+            }
+        });
+
         test('properties before calling start', () => {
             const operationQueue = new OperationQueue();
 
@@ -219,23 +304,18 @@ describe('OperationQueue', () => {
 
             const doneOperations = [];
             operation1.on(OperationEvent.DONE, () => {
-                console.log(doneOperations.length);
                 doneOperations.push(operation1);
             });
             operation2.on(OperationEvent.DONE, () => {
-                console.log(doneOperations.length);
                 doneOperations.push(operation2);
             });
             operation3.on(OperationEvent.DONE, () => {
-                console.log(doneOperations.length);
                 doneOperations.push(operation3);
             });
             operation4.on(OperationEvent.DONE, () => {
-                console.log(doneOperations.length);
                 doneOperations.push(operation4);
             });
             operation5.on(OperationEvent.DONE, () => {
-                console.log(doneOperations.length);
                 doneOperations.push(operation5);
             });
 

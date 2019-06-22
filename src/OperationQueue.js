@@ -7,7 +7,6 @@ class OperationQueue {
 
     constructor() {
         this.ee = new EventEmitter();
-        this.time = {};
         this.map = {};
         this.operations = [];
         this._processedOperations = [];
@@ -40,10 +39,6 @@ class OperationQueue {
         this.ee.off(event, cb);
     }
 
-    get totalTime() {
-        return Math.abs((this.time.start.getTime() - this.time.end.getTime()) / 1000);
-    }
-
     get isExecuting() {
         return !this._isEmpty(this.map);
     }
@@ -53,7 +48,6 @@ class OperationQueue {
             return;
         }
         
-        this.time.end = new Date();
         this._isDone = true;
         this.completionCallback && this.completionCallback();
         this.resolve();
@@ -79,12 +73,18 @@ class OperationQueue {
     }
 
     pause() {
-        this._paused = true;
+        if (!this._paused) {
+            this._paused = true;
+            this.ee.emit(QueueEvent.PAUSED, this);
+        }
     }
 
     resume() {
-        this._paused = false;
-        this._checkNextOperation();
+        if (this._paused) {
+            this._paused = false;
+            this.ee.emit(QueueEvent.RESUMED, this);
+            this._checkNextOperation();
+        }
     }
 
     get isPaused() {
@@ -92,6 +92,12 @@ class OperationQueue {
     }
 
     _preProcessOperations(operations) {
+        try {
+            new CircularOperationValidator(operations);
+        } catch (e) {
+            throw e;
+        }
+
         operations.forEach(op => {
             if (!this.map[op.id]) {
                 this.map[op.id] = true;
@@ -121,12 +127,7 @@ class OperationQueue {
             this._startOperations();
         } else {
             this.promise = new Promise((resolve, reject) => {
-                try {
-                    new CircularOperationValidator(this._processedOperations);
-                } catch (e) {
-                    return reject(e);
-                }
-                this.time.start = new Date();
+            
                 this.resolve = resolve;
                 
                 this._startOperations();
@@ -165,7 +166,7 @@ class OperationQueue {
         
         delete this.map[operation.id];
         delete this.runningQueueMap[operation.id];
-        
+
         if (this._isEmpty(this.map)) {
             this.ee.emit(QueueEvent.DONE, this);
             this.done();
