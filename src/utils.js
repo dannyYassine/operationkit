@@ -6,7 +6,6 @@ const copyObject = object => {
     return Object.assign(Object.create(object), object);
 }
 
-
 module.exports = {
     copyArray,
     copyObject
