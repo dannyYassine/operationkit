@@ -2,9 +2,20 @@ language: node_js
 node_js:  
   - 'node'
 
-script:  
-  - npm install
-  - npm run test-coverage
+jobs:
+  include:
+    - stage: install
+      script: npm install
+    - stage: build
+      script: npm run build
+    - stage: coverage
+      script: npm run test-coverage
+
+stages:
+  - install
+  - name: build
+    if: (branch = master) AND (type = push)
+  - coverage
 
 after_success:
   - npm run coveralls
