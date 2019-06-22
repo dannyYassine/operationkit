@@ -4,6 +4,8 @@ node_js:
 
 script:  
   - npm install
+  - npm run build
   - npm run test-coverage
 
-after_success: 'npm run coveralls'
+after_success:
+  - npm run coveralls

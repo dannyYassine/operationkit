@@ -61,6 +61,15 @@ describe('BlockOperation', () => {
             expect(operation.id).toEqual(1);
             expect(runFunction).toHaveBeenCalled();
         }); 
+
+        test('it should throw error if no parameters are passed in', (done) => {
+            try {
+                const operation = new BlockOperation();
+                fail('should have failed at this point');
+            } catch (e) {
+                done();
+            }
+        }); 
     });
 
     describe('function start', () => {
