@@ -4,10 +4,6 @@ node_js:
 
 jobs:
   include:
-    - stage: install
-      script: npm install
-    - stage: build
-      script: npm run build
     - stage: push
       script: ./scripts/push.sh
     - stage: coverage
@@ -27,8 +23,6 @@ script:
 
 stages:
   - coverage
-
-after_success:
   - name: push
     if: (branch = master) AND (type = push)
   - name: deploy-npm
