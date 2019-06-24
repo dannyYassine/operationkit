@@ -6,14 +6,14 @@ setup_git() {
 }
 
 commit_files() {
-  git checkout -b next
+  git checkout -b master
   ls -al
   git add .
   git commit --message "Travis build: ${TRAVIS_BUILD_NUMBER}"
 }
 
 upload_files() {
-  git push next
+  git push master
 }
 
 setup_git
