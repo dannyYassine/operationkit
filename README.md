@@ -2,7 +2,6 @@
 
 [![Version](https://img.shields.io/npm/v/operationkit.svg)](https://www.npmjs.com/package/operationkit)
 
-[![Version](https://img.shields.io/npm/v/operationkit.svg)](https://www.npmjs.com/package/operationkit)
 [![Coverage Status](https://coveralls.io/repos/github/dannyYassine/operationkit/badge.svg?branch=master)](https://coveralls.io/github/dannyYassine/operationkit?branch=master)
 [![Build Status](https://travis-ci.org/dannyYassine/operationkit.svg?branch=master)](https://travis-ci.org/dannyYassine/operationkit)
 [![install size](https://packagephobia.now.sh/badge?p=operationkit)](https://packagephobia.now.sh/result?p=operationkit)
@@ -30,14 +29,14 @@ npm install operationkit
 
 ```javascript
 const {
-	Operation,
-	OpreationQueue,
-	BlockOperation,
-	GroupOperation,
-	OperationEvent,
-	QueueEvent,
-	QueuePriority
-} =  require('operationkit');
+    Operation,
+    OpreationQueue,
+    BlockOperation,
+    GroupOperation,
+    OperationEvent,
+    QueueEvent,
+    QueuePriority
+} = require('operationkit');
 ```
 
 ## Operation
@@ -113,6 +112,7 @@ getUsersApi.dependencies = [validateToken];
 getUsersApi.completionCallback = operation => {
     // operation.result;
 };
+
 getUsersApi.start()
     .then(result => { ... })
     .catch(e => { ... });
@@ -143,6 +143,7 @@ apiOperation.on(OperationEvent.START, (operation) => {
 ```
 
 ## OperationQueue
+
 A queue orchestrates the execution of operations. An operation queue executes its queued Operation objects based on their priority and readiness*.
 
 ```javascript
@@ -185,7 +186,7 @@ QueuePriority.veryLow
 These constants let you prioritize the order in which operations execute:
 
 ```javascript
-const getCacheData = new getCacheDataOperation();
+const getCacheData = new GetCacheDataOperation();
 getCacheData.queuePriority = QueuePriority.high;
 
 const downloaHighRestImage = new DownloaHighRestImageOperation();
