@@ -9,6 +9,8 @@ jobs:
     - stage: build
       script: npm run build
     - stage: push
+      before_install:
+        - chmod +x scripts/push.sh
       script: ./scripts/push.sh
     - stage: coverage
       script: 
