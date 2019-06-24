@@ -31,12 +31,9 @@ jobs:
 
 stages:
   - name: install
-    if: (branch != test-push)
   - name: build
-    if: (branch != test-push)
   - name: coverage
-    if: (branch != test-push)
   - name: push
-    if: (branch = test-push)
+    if: (branch = master) AND (type = push)
   - name: deploy-npm
     if: (branch = master) AND (type = push)
