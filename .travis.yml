@@ -15,7 +15,7 @@ jobs:
     - stage: push
       before_script:
         - chmod +x scripts/push.sh
-      script: ./scripts/push.sh
+      script: . ./scripts/push.sh
     - stage: deploy-npm
       install:
         - npm install
