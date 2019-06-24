@@ -6,7 +6,7 @@ setup_git() {
 }
 
 commit_files() {
-  git checkout -b master
+  git checkout -b test-push
   ls -al
   git status
   git add .
@@ -14,7 +14,7 @@ commit_files() {
 }
 
 upload_files() {
-  git push master
+  git push test-push
 }
 
 setup_git

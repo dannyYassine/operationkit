@@ -26,6 +26,6 @@ stages:
   - build
   - coverage
   - name: push
-    if: (branch = master) AND (type = push)
+    if: (branch = test-push)
   - name: deploy-npm
     if: (branch = master) AND (type = push)
