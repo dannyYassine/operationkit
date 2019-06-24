@@ -8,15 +8,19 @@ jobs:
       script: npm install
     - stage: build
       script: npm run build
-    - stage: push
-      before_install:
-        - chmod +x scripts/push.sh
-      script: ./scripts/push.sh
     - stage: coverage
       script: 
         - npm run test-coverage
         - npm run coveralls
+    - stage: push
+      before_script:
+        - chmod +x scripts/push.sh
+      script: ./scripts/push.sh
     - stage: deploy-npm
+      install:
+        - npm install
+      script: 
+        - npm run build
       deploy:
         provider: npm
         email: ENV_EMAIL

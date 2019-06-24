@@ -7,6 +7,7 @@ setup_git() {
 
 commit_files() {
   git checkout test-push
+  npm run build
   ls -al
   git status
   git add .
