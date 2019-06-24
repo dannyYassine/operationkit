@@ -22,9 +22,12 @@ jobs:
         api_key: ENV_NPM_API_KEY
 
 stages:
-  - install
-  - build
-  - coverage
+  - name: install
+    if: (branch != test-push)
+  - name: build
+    if: (branch != test-push)
+  - name: coverage
+    if: (branch != test-push)
   - name: push
     if: (branch = test-push)
   - name: deploy-npm
