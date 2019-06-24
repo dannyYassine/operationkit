@@ -216,6 +216,7 @@ class OperationQueue {
 
     _onOperationCancel(operation) {
         delete this.map[operation.id];
+        this.operations = this.operations.filter(op => op.id !== operation.id);
         if (this._isEmpty(this.map)) {
             this.ee.emit(QueueEvent.DONE, this);
             this.done();
