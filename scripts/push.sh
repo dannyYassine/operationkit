@@ -8,6 +8,7 @@ setup_git() {
 commit_files() {
   git checkout -b master
   ls -al
+  git status
   git add .
   git commit --message "Travis build: ${TRAVIS_BUILD_NUMBER}"
 }
