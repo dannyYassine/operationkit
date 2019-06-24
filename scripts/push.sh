@@ -6,15 +6,18 @@ setup_git() {
 }
 
 commit_files() {
-  git checkout -b master
+  git checkout master
   ls -al
   git status
-  git add .
+  git add dist/operationkit.min.js
+  git add dist/operationkit.min.js.map
+  ls -al
+  git status
   git commit --message "Travis build: ${TRAVIS_BUILD_NUMBER}"
 }
 
 upload_files() {
-  git push master
+  git push "https://${ENV_GITHUB_USERNAME}:${ENV_GITHUB_PASSWORD}@github.com/dannyYassine/operationkit.git/"
 }
 
 setup_git
