@@ -6,7 +6,7 @@ setup_git() {
 }
 
 commit_files() {
-  git checkout test-push
+  git checkout master
   ls -al
   git status
   git add dist/operationkit.min.js
