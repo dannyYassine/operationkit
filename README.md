@@ -1,11 +1,17 @@
-# operationkit
+## operationkit
 
+[![Version](https://img.shields.io/npm/v/operationkit.svg)](https://www.npmjs.com/package/operationkit)
+
+[![Version](https://img.shields.io/npm/v/operationkit.svg)](https://www.npmjs.com/package/operationkit)
 [![Coverage Status](https://coveralls.io/repos/github/dannyYassine/operationkit/badge.svg?branch=master)](https://coveralls.io/github/dannyYassine/operationkit?branch=master)
 [![Build Status](https://travis-ci.org/dannyYassine/operationkit.svg?branch=master)](https://travis-ci.org/dannyYassine/operationkit)
-[![Version](https://img.shields.io/npm/v/operationkit.svg)](https://www.npmjs.com/package/operationkit)
 [![install size](https://packagephobia.now.sh/badge?p=operationkit)](https://packagephobia.now.sh/result?p=operationkit)
+[![Downloads](https://img.shields.io/npm/dm/operationkit.svg)](https://npm-stat.com/charts.html?package=operationkit)
+[![Dependencies](https://img.shields.io/david/dannyyassine/operationkit.svg)](https://david-dm.org/dannyyassine/operationkit)
 
 Inspried by [Operation](https://developer.apple.com/documentation/foundation/operation) and [OperationQueue](https://developer.apple.com/documentation/foundation/operationqueue) classes from the iOS Framework.
+
+Universal package for the browser and node.js
 
 ## Installation
 
@@ -15,16 +21,30 @@ npm install operationkit
 
 ## Classes
 
-* Operation
-* BlockOperation
-* OperationQueue
-* GroupOperation
+* [Operation](#operation) 
+* [OperationQueue](#operation-queue)
+* [BlockOperation](#blockoperation)
+* [GroupOperation](#groupoperation)
+
+## Use
+
+```javascript
+const {
+	Operation,
+	OpreationQueue,
+	BlockOperation,
+	GroupOperation,
+	OperationEvent,
+	QueueEvent,
+	QueuePriority
+} =  require('operationkit');
+```
 
 ## Operation
 
 An abstract class that represents a single task.
 
-```
+```javascript
 const operation = new Operation();
 
 const result = await operation.start();
@@ -32,12 +52,13 @@ const result = await operation.start();
 
 ### Extend the Operation class for complex tasks
 
-```
+```javascript
 class ValidateTokenOperation extends Operation {
     
     /**
      * Method to implement to run custom task
      * @override
+     * @returns {Promise}
      */
     run() {
         [...]
@@ -46,9 +67,29 @@ class ValidateTokenOperation extends Operation {
 }
 ```
 
+The `run` function must always return a **promise**. 
+
+```javascript
+run() {
+	return new Promise((resolve, reject) => {
+		[...]
+	})
+}
+``` 
+
+or simply use **async** keyword when overriding the function.
+
+```javascript
+async run() {
+	[...]
+}
+``` 
+
 ### Add dependencies
 
-```
+The operation will execute only when all dependencies are resolved.
+
+```javascript
 operation1.dependencies = [operation2];
 operation1.start()
 ```
@@ -62,9 +103,9 @@ Console:
 // operation1 done
 ```
 
-### Create a list of complex operations that represents your application
+### Create a collection of complex operations that represents your application
 
-```
+```javascript
 const validateToken = new ValidateTokenOperation();
 const getUsersApi = new GetUsersApi();
 
@@ -79,7 +120,7 @@ getUsersApi.start()
 
 Or set the dependency directly in the subclass:
 
-```
+```javascript
 class GetUsersApi extends Operation {
     constructor() {
         this.dependencies = [new ValidateTokenOperation()];
@@ -87,26 +128,36 @@ class GetUsersApi extends Operation {
 }
 ```
 
+### Operation Events
+
+* **OperationEvent.START**	Operation has started to run the task
+* **OperationEvent.READY** Operation is ready to be executed
+* **OperationEvent.DONE** Operation is finished running the task
+* **OperationEvent.CANCEL** Operation was cancelled
+* **OperationEvent.ERROR** An error occured while running the task
+
+```javascript
+apiOperation.on(OperationEvent.START, (operation) => {
+	console.log(operation);
+})
+```
+
 ## OperationQueue
 A queue orchestrates the execution of operations. An operation queue executes its queued Operation objects based on their priority and readiness*.
 
-```
+```javascript
 const operationQueue = new OperationQueue();
 
-const operation1 = new BlockOperation(1, async () => {
-    [...]
-});
+const operation1 = new ApiOperation();
 
-const operation2 = new BlockOperation(2, async () => {
-    [...]
-});
+const operation2 = new ApiOperation();
 
 operationQueue.addOperations([operation1, operation2]);
 ```
 
 ### Utilizing OperationQueue's maximum concurrent operations
 
-```
+```javascript
 operationQueue.maximumConcurentOperations = 2;
 ```
 
@@ -119,10 +170,42 @@ Console:
 // operation2 done
 ```
 
+### Queue Priority
+
+Specify the relative ordering of operations that are waiting to be started in an operation queue.
+
+```javascript
+QueuePriority.veryHigh
+QueuePriority.high
+QueuePriority.normal
+QueuePriority.low
+QueuePriority.veryLow
+```
+
+These constants let you prioritize the order in which operations execute:
+
+```javascript
+const getCacheData = new getCacheDataOperation();
+getCacheData.queuePriority = QueuePriority.high;
+
+const downloaHighRestImage = new DownloaHighRestImageOperation();
+getCacheData.queuePriority = QueuePriority.normal;
+
+operationQueue.addOperations([getCacheData, downloaHighRestImage]);
+```
+
+Console:
+
+```
+// getCacheData started
+// getCacheData done
+// downloaHighRestImage started
+// downloaHighRestImage done
+```
 
 ### Inserting operations in a queue to control flow
 
-```
+```javascript
 const blockOperation6 = new BlockOperation(6, async () => {
     const response = await axios.get('https://samples.openweathermap.org/data/2.5/weather?lat=35&lon=139&appid=b6907d289e10d714a6e88b30761fae22');
     const data = response.data;
@@ -151,67 +234,44 @@ operationQueue.completionCallback = () => {
     console.log('queue done');
 };
 
-operationQueue.addOperations([operation3])
-    .then(result => {
-        console.log(result)
-    })
-    .catch(e => {
-        console.log(e)
-    });
+operationQueue.addOperations([operation3]);
+    
 ```
 
-### Queue Priority
+### OperationQueue Events
 
-Specify the relative ordering of operations that are waiting to be started in an operation queue.
+* **OperationEvent.DONE** OperationQueue has finished running all operations
+* **OperationEvent.PAUSED** OperationQueue has paused
+* **OperationEvent.RESUMED** OperationQueue has resumed
 
-```
-QueuePriority.veryHigh
-QueuePriority.high
-QueuePriority.normal
-QueuePriority.low
-QueuePriority.veryLow
-```
-
-These constants let you prioritize the order in which operations execute:
-
-```
-const getCacheData = new getCacheDataOperation();
-getCacheData.queuePriority = QueuePriority.high;
-
-const downloaHighRestImage = new DownloaHighRestImageOperation();
-getCacheData.queuePriority = QueuePriority.normal;
-
-operationQueue.addOperations([getCacheData, downloaHighRestImage]);
+```javascript
+queue.on(OperationEvent.PAUSED, (operationQueue) => {
+	console.log(operationQueue);
+})
 ```
 
-Console:
+## BlockOperation
 
-```
-// getCacheData started
-// getCacheData done
-// downloaHighRestImage started
-// downloaHighRestImage done
-```
+A helper class that accepts a function which will be exexuted as the operation's task.
 
-## BlockOperation: A Helper Class that accepts a function
-
-```
-const operation = new BlockOperation(6, async () => {
+```javascript
+const operation = new BlockOperation(async () => {
     return new Promise((resolve, reject) => {
             setTimeout(() => {
-                resolve();
+                resolve('my operation result');
             }, 1000);
         })
 });
 
-operation.start()
+const result = await operation.start()
+console.log(result) // 'my operation result'
 ```
 
 ## GroupOperation
 
 Group multiple operations and return the result of each operation when they are all resolved.
 
-```
+```javascript
 const groupOperation = new GroupOperation();
 
 groupOperation.addOperation(new GetUsersApi());
@@ -222,4 +282,20 @@ const [users, posts] = await groupOperation.start();
 
 QueuePriorities are also considered when using GroupOperation.
 
+## Run tests
 
+```bash
+npm run test
+```
+
+## Run coverage
+
+```bash
+npm run test-coverage
+```
+
+## Run new build
+
+```bash
+npm run build
+```
