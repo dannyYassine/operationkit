@@ -8,14 +8,24 @@ jobs:
       script: npm install
     - stage: build
       script: npm run build
+    - stage: push
+      script: ./scripts/push.sh
     - stage: coverage
-      script: npm run test-coverage
+      script: 
+        - npm run test-coverage
+        - npm run coveralls
+    - stage: deploy-npm
+      deploy:
+        provider: npm
+        email: ENV_EMAIL
+        branch: master
+        api_key: ENV_NPM_API_KEY
 
 stages:
   - install
-  - name: build
-    if: (branch = master) AND (type = push)
+  - build
   - coverage
-
-after_success:
-  - npm run coveralls
+  - name: push
+    if: (branch = master) AND (type = push)
+  - name: deploy-npm
+    if: (branch = master) AND (type = push)
