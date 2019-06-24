@@ -1,5 +1,4 @@
 const QueueEvent = {
-    START: 'start',
     DONE: 'done',
     PAUSED: 'paused',
     RESUMED: 'resumed'
