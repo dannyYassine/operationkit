@@ -28,4 +28,4 @@ stages:
   - name: push
     if: (branch = master) AND (type = push)
   - name: deploy-npm
-    if: (branch = master)
+    if: (branch = master) AND (type = push)
