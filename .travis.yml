@@ -4,6 +4,10 @@ node_js:
 
 jobs:
   include:
+    - stage: install
+      script: npm install
+    - stage: build
+      script: npm run build
     - stage: push
       script: ./scripts/push.sh
     - stage: coverage
@@ -17,13 +21,11 @@ jobs:
         branch: master
         api_key: ENV_NPM_API_KEY
 
-script:
-  - npm install
-  - npm run build
-
 stages:
+  - install
+  - build
   - coverage
   - name: push
     if: (branch = master) AND (type = push)
   - name: deploy-npm
-    if: (branch = master OR branch = next)
+    if: (branch = master)
