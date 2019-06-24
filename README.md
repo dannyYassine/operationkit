@@ -3,6 +3,7 @@
 [![Coverage Status](https://coveralls.io/repos/github/dannyYassine/operationkit/badge.svg?branch=master)](https://coveralls.io/github/dannyYassine/operationkit?branch=master)
 [![Build Status](https://travis-ci.org/dannyYassine/operationkit.svg?branch=master)](https://travis-ci.org/dannyYassine/operationkit)
 [![Version](https://img.shields.io/npm/v/operationkit.svg)](https://www.npmjs.com/package/operationkit)
+[![install size](https://packagephobia.now.sh/badge?p=operationkit)](https://packagephobia.now.sh/result?p=operationkit)
 
 Inspried by [Operation](https://developer.apple.com/documentation/foundation/operation) and [OperationQueue](https://developer.apple.com/documentation/foundation/operationqueue) classes from the iOS Framework.
 

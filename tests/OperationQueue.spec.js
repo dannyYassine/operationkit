@@ -337,4 +337,35 @@ describe('OperationQueue', () => {
             });
         });
     });
+
+    describe('function cancel', () => {
+        test('can cancel an operation waiting to be executed in queue', async () => {
+            const operationQueue = new OperationQueue();
+            operationQueue.maximumConcurentOperations = 1;
+
+            const operation1 = new TimeOutOperation(1000);
+            const operation2 = new TestOperation();
+
+            operationQueue.addOperation(operation1);
+            operationQueue.addOperation(operation2);
+            await nextTick();
+            operation2.cancel();
+            await nextTick();
+
+            expect(operationQueue.operations.length).toBe(1);
+        });
+
+        test('cancel last operation to end queue', async (done) => {
+            const operationQueue = new OperationQueue();
+            operationQueue.maximumConcurentOperations = 1;
+            const doneFunction = jest.fn(() => {
+                done();
+            });
+            operationQueue.on(QueueEvent.DONE, doneFunction);
+            const operation = new TestOperation();
+
+            operationQueue.addOperation(operation);
+            operation.cancel();
+        });
+    })
 })
