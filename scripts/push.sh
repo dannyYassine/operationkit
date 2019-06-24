@@ -10,12 +10,13 @@ commit_files() {
   npm run build
   ls -al
   git status
-  git add .
+  git add dist/operationkit.min.js
+  git add dist/operationkit.min.map.js
   git commit --message "Travis build: ${TRAVIS_BUILD_NUMBER}"
 }
 
 upload_files() {
-  git push test-push
+  git push
 }
 
 setup_git
