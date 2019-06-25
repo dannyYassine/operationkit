@@ -8,7 +8,7 @@
 [![Downloads](https://img.shields.io/npm/dm/operationkit.svg)](https://npm-stat.com/charts.html?package=operationkit)
 [![Dependencies](https://img.shields.io/david/dannyyassine/operationkit.svg)](https://david-dm.org/dannyyassine/operationkit)
 
-Inspried by [Operation](https://developer.apple.com/documentation/foundation/operation) and [OperationQueue](https://developer.apple.com/documentation/foundation/operationqueue) classes from Apple's Foundation framework for macOS, iOS, watchOS, and tvOS.
+Inspired by [Operation](https://developer.apple.com/documentation/foundation/operation) and [OperationQueue](https://developer.apple.com/documentation/foundation/operationqueue) classes from Apple's Foundation framework for macOS, iOS, watchOS, and tvOS.
 
 Universal package for the browser and node.js
 
