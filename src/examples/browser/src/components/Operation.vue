@@ -1,5 +1,6 @@
 <template>
     <div>
+        <button @click="onAddClicked()">Add</button>
         <div>Operation 1</div>
         <div>Is executing: {{groupOperation.isExecuting ? true : false}}</div>
         <div>Is finished: {{groupOperation.isFinished ? true : false}}</div>
@@ -73,6 +74,19 @@ export default {
       setTimeout(() => {
           this.queue.addOperation(this.groupOperation3);
       }, 1000);
+  },
+  methods: {
+      onAddClicked() {
+        const operation = new BlockOperation(1, () => {
+          return new Promise((resolve, reject) => {
+              setTimeout(() => {
+                console.log('hello');
+                resolve();
+              }, 1000);
+          })
+                    this.queue.addOperation(operation);
+      });
+      }
   }
 }
 </script>
