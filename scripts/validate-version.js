@@ -9,10 +9,10 @@ const exec = util.promisify(require('child_process').exec);
     console.log(version.trim(), package.version.trim());
     if (version.trim() === package.version.trim()) {
         console.log('Versions are the same. They must be different in order to update.');
-        process.exit(0);
+        process.exit(1);
     } else {
         console.log('success');
-        process.exit(1);
+        process.exit(0);
     }
 })()
 
