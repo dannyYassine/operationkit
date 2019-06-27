@@ -5,18 +5,35 @@
 [![Coverage Status](https://coveralls.io/repos/github/dannyYassine/operationkit/badge.svg?branch=master)](https://coveralls.io/github/dannyYassine/operationkit?branch=master)
 [![Build Status](https://travis-ci.org/dannyYassine/operationkit.svg?branch=master)](https://travis-ci.org/dannyYassine/operationkit)
 [![install size](https://packagephobia.now.sh/badge?p=operationkit)](https://packagephobia.now.sh/result?p=operationkit)
+![npm bundle size](https://img.shields.io/bundlephobia/min/operationkit.svg)
 [![Downloads](https://img.shields.io/npm/dm/operationkit.svg)](https://npm-stat.com/charts.html?package=operationkit)
 [![Dependencies](https://img.shields.io/david/dannyyassine/operationkit.svg)](https://david-dm.org/dannyyassine/operationkit)
 
-Inspried by [Operation](https://developer.apple.com/documentation/foundation/operation) and [OperationQueue](https://developer.apple.com/documentation/foundation/operationqueue) classes from Apple's Foundation framework for macOS, iOS, watchOS, and tvOS.
+Inspired by [Operation](https://developer.apple.com/documentation/foundation/operation) and [OperationQueue](https://developer.apple.com/documentation/foundation/operationqueue) classes from Apple's Foundation framework for macOS, iOS, watchOS, and tvOS.
 
 Universal package for the browser and node.js
 
 ## Installation
 
+with node:
+
 ```
 npm install operationkit
 ```
+
+with yarn:
+
+```
+yarn add operationkit
+```
+
+with cdn:
+
+
+```
+<script src="https://unpkg.com/operationkit/dist/operationkit.min.js"></script>
+```
+![npm bundle size](https://img.shields.io/bundlephobia/min/operationkit.svg)
 
 ## Classes
 
@@ -66,23 +83,46 @@ class ValidateTokenOperation extends Operation {
 }
 ```
 
+### Example
+
+```
+class DownloadDataOperation extends Operation {
+
+    /**
+     * @override
+     */
+    async run() {
+        try {
+            const response = await axios.get('<some_api>');
+            return response.data;
+        } catch (e) {
+            this.cancel();
+        }
+    }
+}
+```
+
+```
+const apiOperation = new DownloadDataOperation();
+```
+
 The `run` function must always return a **promise**. 
 
 ```javascript
 run() {
-	return new Promise((resolve, reject) => {
-		[...]
-	})
+    return new Promise((resolve, reject) => {
+        [...]
+    })
 }
-``` 
+```
 
 or simply use **async** keyword when overriding the function.
 
 ```javascript
 async run() {
-	[...]
+     [...]
 }
-``` 
+```
 
 ### Add dependencies
 
