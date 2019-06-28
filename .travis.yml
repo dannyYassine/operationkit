@@ -42,12 +42,13 @@ jobs:
       before_script:
         - npm run build
         - chmod +x scripts/prep-github-release.sh
-      script: 
+      script:
+        - node update-git-tag.js
         - . ./scripts/prep-github-release.sh
       deploy:
         provider: releases
         api_key: $ENV_GITHUB_TOKEN
-        file: "./temp/operationkit.zip"
+        file: "./.temp/operationkit.zip"
         skip_cleanup: true
         on:
           tags: true
