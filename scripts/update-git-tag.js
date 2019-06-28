@@ -7,6 +7,7 @@ const exec = util.promisify(require('child_process').exec);
     try {
         const package = require('../package.json');
 
+        console.log('git config --global user.name "Travis CI"');
         const exec1 = await exec('git config --global user.name "Travis CI"', { shell: true});
 
         console.log(`Running: git tag ${package.version}`);
