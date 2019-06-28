@@ -14,7 +14,7 @@ const exec = util.promisify(require('child_process').exec);
         const exec2 = await exec(`git tag ${package.version}`, { shell: true});
 
         console.log(`Running: git push --tags`);
-        const exec3 = await exec(`git push "https://${ENV_GITHUB_USERNAME}:${ENV_GITHUB_PASSWORD}@github.com/dannyYassine/operationkit.git/" --tags`, { shell: true});
+        const exec3 = await exec(`git push "https://${process.env.ENV_GITHUB_USERNAME}:${process.env.ENV_GITHUB_PASSWORD}@github.com/dannyYassine/operationkit.git/" --tags`, { shell: true});
 
         console.log('SUCCESS');
         process.exit(0);
