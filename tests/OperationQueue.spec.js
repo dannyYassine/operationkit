@@ -198,7 +198,6 @@ describe('OperationQueue', () => {
                 await nextTick();
                 fail('should have failed');
             } catch (e) {
-                console.log(e);
                 expect(e.constructor.name === 'CircularOperationValidatorError').toBe(true);
                 done();
             }

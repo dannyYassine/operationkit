@@ -95,6 +95,22 @@ describe('BlockOperation', () => {
             expect(operation.blocks.length).toEqual(2);
         });
 
+        test('should call new function blocks', async () => {
+            const mockBlock1 = jest.fn(() => {});
+            const mockBlock2 = jest.fn(() => {});
+            const mockBlock3 = jest.fn(() => {});
+
+            const operation = new BlockOperation(mockBlock1);
+            operation.addBlock(mockBlock2);
+            operation.addBlock(mockBlock3);
+    
+            await operation.start();
+
+            expect(mockBlock1).toHaveBeenCalled();
+            expect(mockBlock2).toHaveBeenCalled();
+            expect(mockBlock3).toHaveBeenCalled();
+        });
+
         test('should not add function block if not of function type', () => {
             const operation = new BlockOperation(() => {});
 
