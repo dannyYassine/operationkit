@@ -84,4 +84,23 @@ describe('BlockOperation', () => {
             expect(runFunction).toHaveBeenCalled();
         });
     })
+
+    describe('function addBlock', () => {
+        test('should add new function block', () => {
+            const operation = new BlockOperation(() => {});
+
+            operation.addBlock(() => {
+            });
+    
+            expect(operation.blocks.length).toEqual(2);
+        });
+
+        test('should not add function block if not of function type', () => {
+            const operation = new BlockOperation(() => {});
+
+            operation.addBlock('this is not a function');
+    
+            expect(operation.blocks.length).toEqual(1);
+        });
+    })
 });
