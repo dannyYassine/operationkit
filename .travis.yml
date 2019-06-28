@@ -43,7 +43,7 @@ jobs:
         - npm run build
         - chmod +x scripts/prep-github-release.sh
       script:
-        - node update-git-tag.js
+        - node scripts/update-git-tag.js
         - . ./scripts/prep-github-release.sh
       deploy:
         provider: releases
