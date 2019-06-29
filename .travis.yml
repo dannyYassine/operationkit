@@ -22,12 +22,19 @@ jobs:
         - chmod +x scripts/validate-version.js
       script:
         - node scripts/validate-version.js 
-    - stage: push
+    - stage: deploy-github
       before_script:
         - npm run build
         - chmod +x scripts/push.sh
       script: 
         - . ./scripts/push.sh
+        - node scripts/update-git-tag.js
+      deploy:
+        provider: releases
+        api_key: $ENV_GITHUB_TOKEN
+        skip_cleanup: true
+        on:
+          tags: true
     - stage: deploy-npm
       install:
         - npm install
@@ -38,20 +45,7 @@ jobs:
         email: $ENV_EMAIL
         branch: master
         api_key: $ENV_NPM_API_KEY
-    - stage: deploy-github-releases
-      before_script:
-        - npm run build
-        - chmod +x scripts/prep-github-release.sh
-      script:
-        - node scripts/update-git-tag.js
-        - . ./scripts/prep-github-release.sh
-      deploy:
-        provider: releases
-        api_key: $ENV_GITHUB_TOKEN
-        file: "./.temp/operationkit.zip"
-        skip_cleanup: true
-        on:
-          tags: true
+      
 
 stages:
   - name: validate-version
@@ -59,9 +53,7 @@ stages:
   - name: install
   - name: build
   - name: coverage
-  - name: push
+  - name: deploy-github
     if: (branch = master) AND (type = push)
   - name: deploy-npm
-    if: (branch = master) AND (type = push)
-  - name: deploy-github-releases
     if: (branch = master) AND (type = push)

@@ -27,8 +27,6 @@ class OperationQueue {
             [QueuePriority.low]: [],
             [QueuePriority.veryLow]: []
         }
-
-        this._isDone = false;
     }
     
     on(event, cb) {
@@ -44,11 +42,6 @@ class OperationQueue {
     }
 
     done() {
-        if (this._isDone) {
-            return;
-        }
-        
-        this._isDone = true;
         this.completionCallback && this.completionCallback();
         this.resolve();
     }

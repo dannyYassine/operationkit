@@ -1,6 +1,6 @@
 
 class CircularOperationValidatorError extends Error {
-    constructor(message = 'Circular dependency') {
+    constructor(message) {
         super()
         this.message = message;
     }
