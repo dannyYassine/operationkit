@@ -5,6 +5,10 @@ setup_git() {
   git config --global user.name "Travis CI"
 }
 
+build() {
+  npm run build
+}
+
 commit_files() {
   git checkout master
   ls -al
@@ -21,5 +25,6 @@ upload_files() {
 }
 
 setup_git
+build
 commit_files
 upload_files

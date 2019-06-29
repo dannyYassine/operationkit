@@ -24,7 +24,6 @@ jobs:
         - node scripts/validate-version.js 
     - stage: deploy-github
       before_script:
-        - npm run build
         - chmod +x scripts/push.sh
       script: 
         - . ./scripts/push.sh
