@@ -6,6 +6,7 @@ branches:
   only:
   - master
   - next
+  - gh-pages
   
 jobs:
   include:

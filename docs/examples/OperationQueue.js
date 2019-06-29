@@ -1,6 +1,6 @@
-const { Operation } = require('../Operation');
-const { OperationQueue } = require('../OperationQueue');
-const { QueuePriority } = require('../QueuePriority');
+const { Operation } = require('../../src/Operation');
+const { OperationQueue } = require('../../src/OperationQueue');
+const { QueuePriority } = require('../../src/QueuePriority');
 
 class TimeOutOperation extends Operation {
     async run() {
