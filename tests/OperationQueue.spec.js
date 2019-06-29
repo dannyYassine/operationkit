@@ -198,7 +198,6 @@ describe('OperationQueue', () => {
                 await nextTick();
                 fail('should have failed');
             } catch (e) {
-                console.log(e);
                 expect(e.constructor.name === 'CircularOperationValidatorError').toBe(true);
                 done();
             }
@@ -337,6 +336,38 @@ describe('OperationQueue', () => {
             });
         });
     });
+
+    describe('function completionCallback', () => {
+        test('should call completionCallback when operationQueue finished running operations', async (done) => {
+            const operationQueue = new OperationQueue();
+            operationQueue.maximumConcurentOperations = 1;
+            operationQueue.completionCallback = () => {
+                done();
+            }
+            const operation = new TestOperation();
+
+            operationQueue.addOperation(operation);
+        });
+
+        test('should always call completionCallback multiple times when operationQueue finished running operations', async (done) => {
+            const operationQueue = new OperationQueue();
+            operationQueue.maximumConcurentOperations = 1;
+            const doneFunction = jest.fn(() => {
+
+                if (doneFunction.mock.calls.length === 1) {
+                    const operation = new TestOperation();
+                    operationQueue.addOperation(operation);
+                } else {
+                    expect(doneFunction.mock.calls.length).toBe(2);
+                    done();
+                }
+            });
+            operationQueue.completionCallback = doneFunction;
+
+            const operation = new TestOperation();
+            operationQueue.addOperation(operation);
+        });
+    })
 
     describe('function cancel', () => {
         test('can cancel an operation waiting to be executed in queue', async () => {

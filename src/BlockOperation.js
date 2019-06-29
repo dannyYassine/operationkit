@@ -20,11 +20,21 @@ class BlockOperation extends Operation {
         }
         
         super(id);
-        this.block = block;
+        this.blocks = [block];
     }
 
     run() {
-        return this.block();
+        const promises = [];
+        this.blocks.forEach(block => {
+            promises.push(block());
+        });
+        return Promise.all(promises);
+    }
+
+    addBlock(block) {
+        if (typeof block === 'function') {
+            this.blocks.push(block);
+        }
     }
 }
 
