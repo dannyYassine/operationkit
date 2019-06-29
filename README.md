@@ -340,3 +340,9 @@ npm run test-coverage
 ```bash
 npm run build
 ```
+
+## Run generate documentation
+
+```bash
+npm run docs
+```

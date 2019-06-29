@@ -3,69 +3,78 @@ const uuidv4 = require('uuid/v4');
 
 const { OperationEvent } = require('./OperationEvent');
 const { QueuePriority } = require('./QueuePriority');
-const { copyArray } = require('./utils');
+const { copyArray, isObjectEmpty } = require('./utils');
 
+/**
+ * @class Operation
+ * @constructor Operation
+ * @description Abstract class which runs a single task
+ */
 class Operation {
 
+    /**
+     * @param {number} id 
+     */
     constructor(id) {
         if (!id) {
             id = uuidv4()
         }
 
         this.id = id;
+        this.name = null;
         this.ee = new EventEmitter();
-        this._dependencies = [];
         this.completionCallback = null;
         this.map = {};
         this.isExecuting = false;
+        this.error = true;
+        this.promise = null;
+        this.runPromise = null;
+
+        this._dependencies = [];
         this._done = false;
         this._isInQueue = false;
         this._canStart = false;
         this._cancelled = false;
-        this.error = true;
-        this.name = null;
-        this.promise = null;
-        this.runPromise = null;
         this._queuePriority = QueuePriority.normal;
 
         this._resolve = null;
         this._reject = null;
     }
 
-    done() {
-        this._done = true;
-        this.completionCallback && this.completionCallback(this);
-        this.ee.emit(OperationEvent.DONE, this);
-        this._resolve && this._resolve(this.result);
-    }
-
-    isDone() {
-        return this._done;
-    }
-
+    /**
+     * @description Getter returning if Operation finished its task
+     * @type {boolean}
+     */
     get isFinished() {
         return this._done;
     }
-    
-    cancel() {
-        this._cancelled = true;
-        Promise.resolve(this.promise);
-        this.ee.emit(OperationEvent.CANCEL, this);
-        this._resolve && this._resolve();
-    }
 
+    /**
+     * @description Knowing if operation was cancelled
+     * @type {boolean}
+     */
     get isCancelled() {
         return this._cancelled;
     }
 
+    /**
+     * Setter for isInQueue value
+     */
     set isInQueue(value) {
         this._isInQueue = value;
     }
 
+    /**
+     * Getter for isInQueue value
+     */
     get isInQueue() {
         return this._isInQueue;
     }
 
+    /**
+     * Setter for queuePriority value.
+     * It is only settable when operation has not yet executed, cancelled or finished
+     */
     set queuePriority(value) {
         if (this.isExecuting || this.isCancelled || this.isFinished) {
             return;
@@ -76,10 +85,17 @@ class Operation {
         }
     }
 
+    /**
+     * Getter for queuePriority value
+     */
     get queuePriority() {
         return this._queuePriority;
     }
 
+    /**
+     * Setter for dependencies value.
+     * It is only settable when operation has not yet executed, cancelled or finished
+     */
     set dependencies(value) {
         if (this.isExecuting || this.isCancelled || this.isFinished) {
             return;
@@ -88,6 +104,10 @@ class Operation {
         this._dependencies = value;
     }
 
+    /**
+     * Getter for dependencies value.
+     * When operation is executing, cancelled, or finihsed, this returns a copy
+     */
     get dependencies() {
         if (this.isExecuting || this.isCancelled || this.isFinished) {
             return copyArray(this._dependencies);
@@ -95,48 +115,85 @@ class Operation {
         return this._dependencies;
     }
 
+    /**
+     * @description Cancels the operation if the operation has not started.
+     * @returns {undefined}
+     */
+    cancel() {
+        this._cancelled = true;
+        Promise.resolve(this.promise);
+        this.ee.emit(OperationEvent.CANCEL, this);
+        this._resolve && this._resolve();
+    }
+
+    /**
+     * @description Sets the operation as done. This is usually called internally or by the operationQueue
+     * @returns {undefined}
+     */
+    done() {
+        this._done = true;
+        this.completionCallback && this.completionCallback(this);
+        this.ee.emit(OperationEvent.DONE, this);
+        this._resolve && this._resolve(this.result);
+    }
+
+    /**
+     * @description Knowing if operation finished its task
+     * @returns {boolean} 
+     */
+    isDone() {
+        return this._done;
+    }
+
+    /**
+     * Registers to an OperationEvent
+     * @param {OperationEvent} event 
+     * @param {function} cb 
+     */
     on(event, cb) {
         this.ee.on(event, cb);
     }
 
+    /**
+     * Unregisters to an OperationEvent
+     * @param {OperationEvent} event 
+     * @param {function} cb 
+     */
     off(event, cb) {
         this.ee.off(event, cb);
     }
 
+    /**
+     * Adds an operation as a dependency
+     * @param {Operation} dependency 
+     */
     addDependency(dependency) {
         this._dependencies.push(dependency);
     }
 
+    /**
+     * Removes an operation as a dependency
+     * @param {Operation} dependency 
+     */
     removeDependency(dependency) {
         this._dependencies = this._dependencies.filter(operation => operation.id !== dependency.id)
     }
 
     /**
      * @abstract
-     * Needs to be implemented by sub-class
-     * Task to be executed
+     * @description Needs to be implemented by sub-class
+     *  This is the task to be executed
      */
     async run() {
         throw new Error('run function must be implemented');
     }
 
-    main() {
-        this.isExecuting = true;
-        this.ee.emit(OperationEvent.START, this);
-        this.runPromise = this.run()
-            .then(result => {
-                this.result = result;
-                this.done();
-            })
-            .catch(e => {
-                this.isExecuting = false;
-                this.error = true;
-                this.ee.emit(OperationEvent.ERROR, {err: e, operation: this});
-                this.ee.emit(OperationEvent.DONE, this);
-                this._reject && this._reject();
-            });
-    }
-
+    /**
+     * Method to call to execute the operation's task.
+     * The operation will not run immediatly. It is evaluated at the next tick and evaluates it's depedencies
+     * in order to run. Calling this method multiples times will simply re-evaluate it's readiness
+     * @returns {Promise} 
+     */
     start() {
         if (this.isExecuting || this.isCancelled || this.isFinished) {
             return this.promise;
@@ -156,6 +213,23 @@ class Operation {
             });
         }
         return this.promise;
+    }
+
+    main() {
+        this.isExecuting = true;
+        this.ee.emit(OperationEvent.START, this);
+        this.runPromise = this.run()
+            .then(result => {
+                this.result = result;
+                this.done();
+            })
+            .catch(e => {
+                this.isExecuting = false;
+                this.error = true;
+                this.ee.emit(OperationEvent.ERROR, {err: e, operation: this});
+                this.ee.emit(OperationEvent.DONE, this);
+                this._reject && this._reject();
+            });
     }
 
     _preProcessStart() {
@@ -193,7 +267,7 @@ class Operation {
         if (this.isExecuting || this.isCancelled || this.isFinished) {
             return;
         }
-        if (this._isEmpty(this.map)) {
+        if (isObjectEmpty(this.map)) {
             // should emit event to let operation queue that this operation can start
             // then it could check if maximum concurrent is not passed
             this._canStart = true;
@@ -205,13 +279,6 @@ class Operation {
         }
     }
 
-    _isEmpty(obj) {
-        for(var key in obj) {
-            if(obj.hasOwnProperty(key))
-                return false;
-        }
-        return true;
-    }
 }
 
 module.exports = {

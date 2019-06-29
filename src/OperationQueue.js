@@ -2,6 +2,7 @@ const EventEmitter = require('events')
 const { CircularOperationValidator } = require('./CircularOperationValidator');
 const { QueuePriority } = require('./QueuePriority');
 const { QueueEvent } = require('./QueueEvent');
+const { isObjectEmpty } = require('./utils');
 
 class OperationQueue {
 
@@ -38,7 +39,7 @@ class OperationQueue {
     }
 
     get isExecuting() {
-        return !this._isEmpty(this.map);
+        return !isObjectEmpty(this.map);
     }
 
     done() {
@@ -160,7 +161,7 @@ class OperationQueue {
         delete this.map[operation.id];
         delete this.runningQueueMap[operation.id];
 
-        if (this._isEmpty(this.map)) {
+        if (isObjectEmpty(this.map)) {
             this.ee.emit(QueueEvent.DONE, this);
             this.done();
         } else {
@@ -175,7 +176,10 @@ class OperationQueue {
 
         if (this.runningQueue.length < this.maximumConcurentOperations && this._hasOperations()) {
             const operation = this._getNextOperation();
-            if (!operation.isExecuting || !operation.isCancelled || !this.runningQueueMap[operation.id]) {
+            if (operation
+                 && !operation.isExecuting
+                 || !operation.isCancelled
+                 || !this.runningQueueMap[operation.id]) {
                 this.runningQueueMap[operation.id] = true;
                 this.runningQueue.push(operation);
                 operation.main();
@@ -204,25 +208,19 @@ class OperationQueue {
         } else if (this.queues[QueuePriority.veryLow].length) {
             return this.queues[QueuePriority.veryLow].pop();
         }
+        return null;
     }
-
 
     _onOperationCancel(operation) {
         delete this.map[operation.id];
+        delete this.queues[operation.queuePriority];
         this.operations = this.operations.filter(op => op.id !== operation.id);
-        if (this._isEmpty(this.map)) {
+        if (isObjectEmpty(this.map)) {
             this.ee.emit(QueueEvent.DONE, this);
             this.done();
         }
     }
 
-    _isEmpty(obj) {
-        for(var key in obj) {
-            if(obj.hasOwnProperty(key))
-                return false;
-        }
-        return true;
-    }
 }
 
 module.exports = {
