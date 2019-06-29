@@ -1,4 +1,6 @@
-const { Operation, BlockOperation, OperationQueue, QueuePriority } = require('operationkit');
+const { Operation } = require('../Operation');
+const { OperationQueue } = require('../OperationQueue');
+const { QueuePriority } = require('../QueuePriority');
 
 class TimeOutOperation extends Operation {
     async run() {

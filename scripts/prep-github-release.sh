@@ -20,12 +20,6 @@ remove_coverage() {
 
 remove_node_modules() {
     rm -rf node_modules
-    cd src/examples/browser
-    rm -rf node_modules
-    cd ..
-    cd node
-    rm -rf node_modules
-    cd ../../../
 }
 
 archive_zip() {
