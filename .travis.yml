@@ -45,7 +45,7 @@ jobs:
         email: $ENV_EMAIL
         branch: master
         api_key: $ENV_NPM_API_KEY
-    - state: deploy-docs
+    - stage: deploy-docs
       before_script:
         - chmod +x scripts/prep-jsdocs.sh
       script:
