@@ -466,5 +466,37 @@ describe('Operation', () => {
             expect(operation.queuePriority).toBe(QueuePriority.high);
             expect(operation.queuePriority).not.toBe(QueuePriority.normal);
         });
+
+        test('should set queue priortiy if it is a valid value', () => {
+            const operation = new Operation();
+
+            operation.queuePriority = QueuePriority.veryHigh;
+            expect(operation.queuePriority).toBe(QueuePriority.veryHigh);
+            
+            operation.queuePriority = QueuePriority.high;
+            expect(operation.queuePriority).toBe(QueuePriority.high);
+            
+            operation.queuePriority = QueuePriority.normal;
+            expect(operation.queuePriority).toBe(QueuePriority.normal);
+
+            operation.queuePriority = QueuePriority.low;
+            expect(operation.queuePriority).toBe(QueuePriority.low);
+
+            operation.queuePriority = QueuePriority.veryLow;
+            expect(operation.queuePriority).toBe(QueuePriority.veryLow);
+        });
+
+        test('should not set queue priortiy if it is not a valid value', () => {
+            const operation = new Operation();
+
+            operation.queuePriority = 'some random value';
+            expect(operation.queuePriority).toBe(QueuePriority.normal);
+
+            operation.queuePriority = 123232132;
+            expect(operation.queuePriority).toBe(QueuePriority.normal);
+
+            operation.queuePriority = -123232132;
+            expect(operation.queuePriority).toBe(QueuePriority.normal);
+        });
     });
 });
