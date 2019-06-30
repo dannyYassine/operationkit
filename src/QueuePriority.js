@@ -1,4 +1,7 @@
 
+/**
+ * Priority given to an operation when it is executed inside an OperationQueue.
+ */
 class QueuePriority {
 
     /**
@@ -41,7 +44,7 @@ class QueuePriority {
      * @param {number} value 
      */
     isValid(value) {
-        return value >= QueuePriority.veryLow && value <= QueuePriority.veryHigh;
+        return value >= this.veryLow && value <= this.veryHigh;
     }
 }
 
