@@ -35,6 +35,10 @@ with cdn:
 ```
 ![npm bundle size](https://img.shields.io/bundlephobia/min/operationkit.svg)
 
+## Documentation
+
+[Go to documentation](https://dannyyassine.github.io/operationkit/docs/index.html)
+
 ## Classes
 
 * [Operation](#operation) 

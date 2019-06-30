@@ -4,4 +4,4 @@ coverage
 .idea
 .temp
 
-esdoc
+jsdocs

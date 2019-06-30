@@ -35,6 +35,11 @@ jobs:
         skip_cleanup: true
         on:
           tags: true
+    - state: deploy-gh-pages
+      before_script:
+        - chmod +x scripts/prep-jsdocs.sh
+      script:
+        - . ./scripts/prep-jsdocs.sh
     - stage: deploy-npm
       install:
         - npm install
@@ -56,3 +61,5 @@ stages:
     if: (branch = master) AND (type = push)
   - name: deploy-npm
     if: (branch = master) AND (type = push)
+  - name: deploy-gh-pages
+    if: (branch = gh-pages) AND (type = push)

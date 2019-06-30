@@ -1,5 +1,9 @@
 const { Operation } = require('./Operation');
 
+/**
+ * Operation Subclass that accepts a function as an argument which will be the task to run.
+ * Additionally, multiple functions can be appended to run simultaneously as the same task.
+ */
 class BlockOperation extends Operation {
 
     constructor() {
@@ -23,6 +27,9 @@ class BlockOperation extends Operation {
         this.blocks = [block];
     }
 
+    /**
+     * @ignore
+     */
     run() {
         const promises = [];
         this.blocks.forEach(block => {
@@ -31,6 +38,10 @@ class BlockOperation extends Operation {
         return Promise.all(promises);
     }
 
+    /**
+     * Append another function to run simultaneously as the same task
+     * @param {function} block - function to add 
+     */
     addBlock(block) {
         if (typeof block === 'function') {
             this.blocks.push(block);

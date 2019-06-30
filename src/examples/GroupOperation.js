@@ -1,5 +1,5 @@
-const { Operation } = require('../src/Operation');
-const { GroupOperation } = require('../src/GroupOperation');
+const { Operation } = require('../Operation');
+const { GroupOperation } = require('../GroupOperation');
 
 class TimeOutOperation extends Operation {
     async run() {

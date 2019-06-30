@@ -4,6 +4,9 @@ const { QueuePriority } = require('./QueuePriority');
 const { QueueEvent } = require('./QueueEvent');
 const { isObjectEmpty } = require('./utils');
 
+/**
+ * @class OperationQueue
+ */
 class OperationQueue {
 
     constructor() {

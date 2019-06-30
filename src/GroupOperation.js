@@ -1,6 +1,9 @@
 const { Operation } = require('./Operation');
 const { OperationQueue } = require('./OperationQueue');
 
+/**
+ * @class GroupOperation
+ */
 class GroupOperation extends Operation {
 
     constructor() {
