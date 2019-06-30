@@ -17,7 +17,7 @@ commit_files() {
   git add dist/operationkit.min.js.map
   ls -al
   git status
-  git commit --message "Travis build: ${TRAVIS_BUILD_NUMBER}"
+  git commit --message "Travis build: ${TRAVIS_BUILD_NUMBER}; Updating operationkit.min.js"
 }
 
 upload_files() {
