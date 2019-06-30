@@ -29,9 +29,11 @@ yarn add operationkit
 
 with cdn:
 
-
 ```
 <script src="https://unpkg.com/operationkit/dist/operationkit.min.js"></script>
+
+// then
+window.operationkit
 ```
 ![npm bundle size](https://img.shields.io/bundlephobia/min/operationkit.svg)
 

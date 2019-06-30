@@ -1,4 +1,5 @@
 const path = require('path');
+const webpack = require('webpack');
 
 module.exports = {
   mode: 'production',
@@ -10,5 +11,10 @@ module.exports = {
     library: 'operationkit',
     libraryTarget: 'umd',
     umdNamedDefine: true
-  }
+  },
+  plugins: [
+    new webpack.ProvidePlugin({
+        operationkit: 'operationkit',
+    })     
+]
 };
