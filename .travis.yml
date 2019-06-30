@@ -35,11 +35,6 @@ jobs:
         skip_cleanup: true
         on:
           tags: true
-    - state: deploy-gh-pages
-      before_script:
-        - chmod +x scripts/prep-jsdocs.sh
-      script:
-        - . ./scripts/prep-jsdocs.sh
     - stage: deploy-npm
       install:
         - npm install
@@ -50,6 +45,11 @@ jobs:
         email: $ENV_EMAIL
         branch: master
         api_key: $ENV_NPM_API_KEY
+    - state: deploy-docs
+      before_script:
+        - chmod +x scripts/prep-jsdocs.sh
+      script:
+        - . ./scripts/prep-jsdocs.sh
 
 stages:
   - name: validate-version
@@ -61,5 +61,5 @@ stages:
     if: (branch = master) AND (type = push)
   - name: deploy-npm
     if: (branch = master) AND (type = push)
-  - name: deploy-gh-pages
+  - name: deploy-docs
     if: (branch = gh-pages) AND (type = push)
