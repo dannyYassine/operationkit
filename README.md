@@ -70,64 +70,6 @@ const operation = new Operation();
 const result = await operation.start();
 ```
 
-### Extend the Operation class for complex tasks
-
-```javascript
-class ValidateTokenOperation extends Operation {
-    
-    /**
-     * Method to implement to run custom task
-     * @override
-     * @returns {Promise}
-     */
-    run() {
-        [...]
-    }
-    
-}
-```
-
-### Example
-
-```
-class DownloadDataOperation extends Operation {
-
-    /**
-     * @override
-     */
-    async run() {
-        try {
-            const response = await axios.get('<some_api>');
-            return response.data;
-        } catch (e) {
-            this.cancel();
-        }
-    }
-}
-```
-
-```
-const apiOperation = new DownloadDataOperation();
-```
-
-The `run` function must always return a **promise**. 
-
-```javascript
-run() {
-    return new Promise((resolve, reject) => {
-        [...]
-    })
-}
-```
-
-or simply use **async** keyword when overriding the function.
-
-```javascript
-async run() {
-     [...]
-}
-```
-
 ### Add dependencies
 
 The operation will execute only when all dependencies are resolved.
@@ -144,6 +86,80 @@ Console:
 // operation2 done
 // operation1 started
 // operation1 done
+```
+
+### Extend the Operation class for complex tasks
+
+```javascript
+class ValidateTokenOperation extends Operation {
+    
+    /**
+     * Method to implement to run custom task
+     * @override
+     * @returns {Promise}
+     */
+    async run() {
+        let token = localStorage.getItem('token');
+        if (!token) {
+            const response = await axios('<refresh_token_api>');
+            token = reponse.data;
+            localStorage.setItem('token', token);
+        }
+        return token;
+    }
+    
+}
+```
+
+The `run` function must always return a **promise**.
+
+```javascript
+run() {
+    return new Promise((resolve, reject) => {
+        const response = await axios.get('<some_api>');
+        resolve(response.data);
+    })
+}
+```
+
+or simply use **async** keyword when overriding the function.
+
+```javascript
+async run() {
+    const response = await axios.get('<some_api>');
+    return response.data
+}
+```
+
+### Example
+
+```javascript
+class DownloadDataOperation extends Operation {
+
+    /**
+     * @override
+     */
+    async run() {
+        try {
+            const response = await axios.get('<some_api>');
+            return response.data;
+        } catch (e) {
+            this.cancel();
+        }
+    }
+}
+```
+
+TO NOTE: you must always return the result from the async function or Promise.resolve. You will have access to the result from the the result property or from resolving your promise.
+
+```javascript
+const downloadOperation = new DownloadDataOperation();
+
+// result is returned from your promise here
+const data = await new DownloadDataOperation();
+
+// and the same result is available from
+downloadOperation.result;
 ```
 
 ### Create a collection of complex operations that represents your application
