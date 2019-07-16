@@ -18,7 +18,7 @@ class GroupOperation extends Operation {
      * @returns {Promise}
      */
     async run() {
-        await this.queue.addOperations(this.operations)
+        await this.queue.addOperations(this.operations);
 
         return this.operations.reduce((accum, operation) => {
             accum.push(operation.result);
@@ -53,4 +53,4 @@ class GroupOperation extends Operation {
 
 module.exports = {
     GroupOperation
-}
+};

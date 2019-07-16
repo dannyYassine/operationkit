@@ -32,34 +32,49 @@ class OperationQueue {
             [QueuePriority.veryLow]: []
         }
     }
-    
+
+    /**
+     * Subscribe to an event
+     * @param {QueueEvent} event
+     * @param {function} cb
+     */
     on(event, cb) {
         this.ee.on(event, cb);
     }
 
+    /**
+     * Unsubscribe to an event
+     * @param {QueueEvent} event
+     * @param {function} cb
+     */
     off(event, cb) {
         this.ee.off(event, cb);
     }
 
+    /**
+     * Getter
+     * @returns {boolean}
+     */
     get isExecuting() {
         return !isObjectEmpty(this.map);
     }
 
+    /**
+     * Complete the queue, this will resolve and notify its callback
+     */
     done() {
         this.completionCallback && this.completionCallback();
         this.resolve();
     }
 
     /**
-     * 
-     * @param {Operation} operation 
+     * @param {Operation} operation
      */
     addOperation(operation) {
         this.addOperations([operation]);
     }
 
     /**
-     * 
      * @param {Array.<Operation>} operations
      */
     addOperations(operations) {
@@ -69,6 +84,9 @@ class OperationQueue {
         this._begin();
     }
 
+    /**
+     * Pauses the queue, no new operations will be added to the queue
+     */
     pause() {
         if (!this._paused) {
             this._paused = true;
@@ -76,6 +94,9 @@ class OperationQueue {
         }
     }
 
+    /**
+     * Resumes the queue from an paused state
+     */
     resume() {
         if (this._paused) {
             this._paused = false;
@@ -84,6 +105,10 @@ class OperationQueue {
         }
     }
 
+    /**
+     * Getter
+     * @returns {boolean|*}
+     */
     get isPaused() {
         return this._paused;
     }
@@ -126,7 +151,7 @@ class OperationQueue {
             this.promise = new Promise((resolve, reject) => {
             
                 this.resolve = resolve;
-                
+
                 this._startOperations();
             });
         }
@@ -228,4 +253,4 @@ class OperationQueue {
 
 module.exports = {
     OperationQueue
-}
+};

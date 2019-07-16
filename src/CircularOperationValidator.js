@@ -58,4 +58,4 @@ class CircularOperationValidator {
 
 module.exports = {
     CircularOperationValidator
-}
+};
