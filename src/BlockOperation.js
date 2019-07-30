@@ -28,6 +28,8 @@ class BlockOperation extends Operation {
     }
 
     /**
+     * @override
+     *
      * @ignore
      */
     run() {
@@ -51,4 +53,4 @@ class BlockOperation extends Operation {
 
 module.exports = {
     BlockOperation
-}
+};

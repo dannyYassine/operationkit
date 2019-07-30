@@ -42,4 +42,4 @@ class OperationEvent {
 
 module.exports = {
     OperationEvent: new OperationEvent()
-}
+};

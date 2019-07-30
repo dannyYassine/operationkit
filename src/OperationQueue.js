@@ -7,10 +7,10 @@ const { isObjectEmpty } = require('./utils');
 /**
  * @class OperationQueue
  */
-class OperationQueue {
+class OperationQueue extends EventEmitter {
 
     constructor() {
-        this.ee = new EventEmitter();
+        super();
         this.map = {};
         this.operations = [];
         this._processedOperations = [];
@@ -32,34 +32,31 @@ class OperationQueue {
             [QueuePriority.veryLow]: []
         }
     }
-    
-    on(event, cb) {
-        this.ee.on(event, cb);
-    }
 
-    off(event, cb) {
-        this.ee.off(event, cb);
-    }
-
+    /**
+     * Getter
+     * @returns {boolean}
+     */
     get isExecuting() {
         return !isObjectEmpty(this.map);
     }
 
+    /**
+     * Complete the queue, this will resolve and notify its callback
+     */
     done() {
         this.completionCallback && this.completionCallback();
         this.resolve();
     }
 
     /**
-     * 
-     * @param {Operation} operation 
+     * @param {Operation} operation
      */
     addOperation(operation) {
         this.addOperations([operation]);
     }
 
     /**
-     * 
      * @param {Array.<Operation>} operations
      */
     addOperations(operations) {
@@ -69,21 +66,31 @@ class OperationQueue {
         this._begin();
     }
 
+    /**
+     * Pauses the queue, no new operations will be added to the queue
+     */
     pause() {
         if (!this._paused) {
             this._paused = true;
-            this.ee.emit(QueueEvent.PAUSED, this);
+            this.emit(QueueEvent.PAUSED, this);
         }
     }
 
+    /**
+     * Resumes the queue from an paused state
+     */
     resume() {
         if (this._paused) {
             this._paused = false;
-            this.ee.emit(QueueEvent.RESUMED, this);
+            this.emit(QueueEvent.RESUMED, this);
             this._checkNextOperation();
         }
     }
 
+    /**
+     * Getter
+     * @returns {boolean|*}
+     */
     get isPaused() {
         return this._paused;
     }
@@ -126,7 +133,7 @@ class OperationQueue {
             this.promise = new Promise((resolve, reject) => {
             
                 this.resolve = resolve;
-                
+
                 this._startOperations();
             });
         }
@@ -147,12 +154,8 @@ class OperationQueue {
     }
 
     _onOperationReady(operation) {
-        if (this.readyQueueMap[operation.id]) {
-            return;
-        }
         this.readyQueueMap[operation.id] = true;
         this.queues[operation.queuePriority].push(operation);
-
         this._checkNextOperation() 
     }
 
@@ -165,7 +168,7 @@ class OperationQueue {
         delete this.runningQueueMap[operation.id];
 
         if (isObjectEmpty(this.map)) {
-            this.ee.emit(QueueEvent.DONE, this);
+            this.emit(QueueEvent.DONE, this);
             this.done();
         } else {
             this._checkNextOperation();
@@ -200,18 +203,19 @@ class OperationQueue {
     }
 
     _getNextOperation() {
+        let operation = null;
         if (this.queues[QueuePriority.veryHigh].length) {
-            return this.queues[QueuePriority.veryHigh].pop();
+            operation = this.queues[QueuePriority.veryHigh].pop();
         } else if (this.queues[QueuePriority.high].length) {
-            return this.queues[QueuePriority.high].pop();
+            operation = this.queues[QueuePriority.high].pop();
         } else if (this.queues[QueuePriority.normal].length) {
-            return this.queues[QueuePriority.normal].pop();
+            operation = this.queues[QueuePriority.normal].pop();
         } else if (this.queues[QueuePriority.low].length) {
-            return this.queues[QueuePriority.low].pop();
+            operation = this.queues[QueuePriority.low].pop();
         } else if (this.queues[QueuePriority.veryLow].length) {
-            return this.queues[QueuePriority.veryLow].pop();
+            operation = this.queues[QueuePriority.veryLow].pop();
         }
-        return null;
+        return operation;
     }
 
     _onOperationCancel(operation) {
@@ -219,7 +223,7 @@ class OperationQueue {
         delete this.queues[operation.queuePriority];
         this.operations = this.operations.filter(op => op.id !== operation.id);
         if (isObjectEmpty(this.map)) {
-            this.ee.emit(QueueEvent.DONE, this);
+            this.emit(QueueEvent.DONE, this);
             this.done();
         }
     }
@@ -228,4 +232,4 @@ class OperationQueue {
 
 module.exports = {
     OperationQueue
-}
+};

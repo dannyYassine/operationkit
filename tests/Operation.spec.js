@@ -18,10 +18,10 @@ describe('Operation', () => {
             expect(operation).toBeDefined();
         });
     
-        test('inherits from Object', () => {
+        test('inherits from EventEmitter', () => {
             const operation = new Operation();
             
-            expect(operation.__proto__.__proto__.constructor.name).toBe('Object');
+            expect(operation.__proto__.__proto__.constructor.name).toBe('EventEmitter');
         });
     
         test('should be valid type', () => {

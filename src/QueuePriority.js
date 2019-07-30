@@ -50,4 +50,4 @@ class QueuePriority {
 
 module.exports = {
     QueuePriority: new QueuePriority()
-}
+};
