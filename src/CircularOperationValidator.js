@@ -1,7 +1,7 @@
 
 class CircularOperationValidatorError extends Error {
     constructor(message) {
-        super()
+        super();
         this.message = message;
     }
 }

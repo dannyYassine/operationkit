@@ -16,6 +16,6 @@ operation1 = new TimeOutOperation();
 operation2 = new TimeOutOperation();
 groupOperation.addOperations([operation1, operation2]);
 
-groupOperation.then(() => {
+groupOperation.start().then(() => {
     console.log('done');
 });

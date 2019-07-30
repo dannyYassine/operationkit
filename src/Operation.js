@@ -10,19 +10,20 @@ const { copyArray, isObjectEmpty } = require('./utils');
  * @constructor Operation
  * @description Abstract class which runs a single task
  */
-class Operation {
+class Operation extends EventEmitter {
 
     /**
      * @param {number} id 
      */
     constructor(id) {
+        super();
+        
         if (!id) {
             id = uuidv4()
         }
 
         this.id = id;
         this.name = null;
-        this.ee = new EventEmitter();
         this.completionCallback = null;
         this.map = {};
         this.isExecuting = false;
@@ -122,7 +123,7 @@ class Operation {
     cancel() {
         this._cancelled = true;
         Promise.resolve(this.promise);
-        this.ee.emit(OperationEvent.CANCEL, this);
+        this.emit(OperationEvent.CANCEL, this);
         this._resolve && this._resolve();
     }
 
@@ -133,7 +134,7 @@ class Operation {
     done() {
         this._done = true;
         this.completionCallback && this.completionCallback(this);
-        this.ee.emit(OperationEvent.DONE, this);
+        this.emit(OperationEvent.DONE, this);
         this._resolve && this._resolve(this.result);
     }
 
@@ -143,24 +144,6 @@ class Operation {
      */
     isDone() {
         return this._done;
-    }
-
-    /**
-     * Registers to an OperationEvent
-     * @param {OperationEvent} event 
-     * @param {function} cb 
-     */
-    on(event, cb) {
-        this.ee.on(event, cb);
-    }
-
-    /**
-     * Unregisters to an OperationEvent
-     * @param {OperationEvent} event 
-     * @param {function} cb 
-     */
-    off(event, cb) {
-        this.ee.off(event, cb);
     }
 
     /**
@@ -201,7 +184,7 @@ class Operation {
             this._preProcessStart();
         } else if (this.promise && this._canStart) {
             if (this._isInQueue) {
-                this.ee.emit(OperationEvent.READY, this);
+                this.emit(OperationEvent.READY, this);
             } else {
                 this.main();
             }
@@ -217,7 +200,7 @@ class Operation {
 
     main() {
         this.isExecuting = true;
-        this.ee.emit(OperationEvent.START, this);
+        this.emit(OperationEvent.START, this);
         this.runPromise = this.run()
             .then(result => {
                 this.result = result;
@@ -226,8 +209,8 @@ class Operation {
             .catch(e => {
                 this.isExecuting = false;
                 this.error = true;
-                this.ee.emit(OperationEvent.ERROR, {err: e, operation: this});
-                this.ee.emit(OperationEvent.DONE, this);
+                this.emit(OperationEvent.ERROR, {err: e, operation: this});
+                this.emit(OperationEvent.DONE, this);
                 this._reject && this._reject();
             });
     }
@@ -237,7 +220,7 @@ class Operation {
 
         if (this._canStart) {
             if (this._isInQueue) {
-                this.ee.emit(OperationEvent.READY, this);
+                this.emit(OperationEvent.READY, this);
             } else {
                 this.main();
             }
@@ -272,7 +255,7 @@ class Operation {
             // then it could check if maximum concurrent is not passed
             this._canStart = true;
             if (this.isInQueue) {
-                this.ee.emit(OperationEvent.READY, this);
+                this.emit(OperationEvent.READY, this);
             } else {
                 this.start();
             }
