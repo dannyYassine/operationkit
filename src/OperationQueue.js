@@ -154,12 +154,8 @@ class OperationQueue extends EventEmitter {
     }
 
     _onOperationReady(operation) {
-        if (this.readyQueueMap[operation.id]) {
-            return;
-        }
         this.readyQueueMap[operation.id] = true;
         this.queues[operation.queuePriority].push(operation);
-
         this._checkNextOperation() 
     }
 
@@ -207,18 +203,19 @@ class OperationQueue extends EventEmitter {
     }
 
     _getNextOperation() {
+        let operation = null;
         if (this.queues[QueuePriority.veryHigh].length) {
-            return this.queues[QueuePriority.veryHigh].pop();
+            operation = this.queues[QueuePriority.veryHigh].pop();
         } else if (this.queues[QueuePriority.high].length) {
-            return this.queues[QueuePriority.high].pop();
+            operation = this.queues[QueuePriority.high].pop();
         } else if (this.queues[QueuePriority.normal].length) {
-            return this.queues[QueuePriority.normal].pop();
+            operation = this.queues[QueuePriority.normal].pop();
         } else if (this.queues[QueuePriority.low].length) {
-            return this.queues[QueuePriority.low].pop();
+            operation = this.queues[QueuePriority.low].pop();
         } else if (this.queues[QueuePriority.veryLow].length) {
-            return this.queues[QueuePriority.veryLow].pop();
+            operation = this.queues[QueuePriority.veryLow].pop();
         }
-        return null;
+        return operation;
     }
 
     _onOperationCancel(operation) {
