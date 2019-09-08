@@ -64,6 +64,8 @@ class OperationQueue extends EventEmitter {
         this._preProcessOperations(operations);
         this._processedOperations = this._processedOperations.concat(this.operations);
         this._begin();
+
+        return this.promise;
     }
 
     /**
@@ -180,7 +182,7 @@ class OperationQueue extends EventEmitter {
             return;
         }
 
-        if (this.runningQueue.length < this.maximumConcurentOperations && this._hasOperations()) {
+        if (this.runningQueue.length < this.maximumConcurentOperations && this.hasOperations()) {
             const operation = this._getNextOperation();
             if (operation
                  && !operation.isExecuting
@@ -194,7 +196,7 @@ class OperationQueue extends EventEmitter {
         }
     }
 
-    _hasOperations() {
+    hasOperations() {
         return !!(this.queues[QueuePriority.veryHigh].length
         + this.queues[QueuePriority.high].length
         + this.queues[QueuePriority.normal].length

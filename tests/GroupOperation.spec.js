@@ -1,5 +1,5 @@
 const { GroupOperation } = require('../src/GroupOperation');
-const { TestOperation } = require('./TestOperation');
+const { TestOperation, TimeOutOperation } = require('./TestOperation');
 
 describe('GroupOperation', () => {
 
@@ -110,16 +110,40 @@ describe('GroupOperation', () => {
             const operation2 = new TestOperation(2);
             const groupOperation = new GroupOperation();
             
-            groupOperation.addOperation(operation1);
             groupOperation.addOperation(operation2);
+            groupOperation.addOperation(operation1);
 
-            const [result1, result2] = await groupOperation.start();
+            const [result2, result1] = await groupOperation.start();
 
             expect(result1).toBe(operation1.result);
             expect(result2).toBe(operation2.result);
 
             done();
-        })
+        });
+
+        test('finishes when all dependent operations are finished asynchronously', async (done) => {
+            const operation1 = new TimeOutOperation(1000, 'return1');
+            const operation2 = new TimeOutOperation(2000, 'return2');
+            const groupOperation = new GroupOperation();
+            
+            groupOperation.addOperation(operation2);
+            groupOperation.addOperation(operation1);
+
+            const [result2, result1] = await groupOperation.start();
+
+            console.log(result1, result2, operation1.result, operation2.result);
+
+            expect(result1).toBe(operation1.resultToReturn);
+            expect(result2).toBe(operation2.resultToReturn);
+
+            expect(result1).toBe(operation1.result);
+            expect(result2).toBe(operation2.result);
+
+            expect(operation1.result).toBe(operation1.resultToReturn);
+            expect(operation2.result).toBe(operation2.resultToReturn);
+
+            done();
+        });
     })
     
 })
