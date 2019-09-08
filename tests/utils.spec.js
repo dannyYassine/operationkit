@@ -1,5 +1,6 @@
 const { copyArray, copyObject, isObjectEmpty } = require('../src/utils');
 const { Operation } = require('../src/Operation');
+const { TimeOutOperation } = require('./TestOperation');
 
 describe('function copyArray', function () {
     test('copy array of objects', () => {
@@ -30,3 +31,12 @@ describe('function isObjectEmpty', function () {
         expect(isObjectEmpty(object)).toBe(false);
     });
 });
+
+describe('TimeOutOperation', () => {
+    test('should generate a timeout between 0 and 1000 if not passed', () => {
+        const operation = new TimeOutOperation();
+
+        expect(operation.time).toBeLessThan(1000);
+        expect(operation.time).toBeGreaterThan(0);
+    });
+})
