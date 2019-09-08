@@ -10,13 +10,18 @@ class TestOperation extends Operation {
 
 class TimeOutOperation extends Operation {
 
-    constructor(time) {
+    constructor(time, resultToReturn = null) {
         super();
-        this.timer = time;
+        if (!time) {
+            time = Math.random() * 1000;
+        }
+        this.time = time;
+        this.resultToReturn = resultToReturn;
     }
 
     async run() {
-        return delay(this.time)
+        await delay(this.time)
+        return this.resultToReturn
     }
 }
 

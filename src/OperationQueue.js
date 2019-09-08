@@ -64,6 +64,8 @@ class OperationQueue extends EventEmitter {
         this._preProcessOperations(operations);
         this._processedOperations = this._processedOperations.concat(this.operations);
         this._begin();
+
+        return this.promise;
     }
 
     /**
@@ -180,7 +182,7 @@ class OperationQueue extends EventEmitter {
             return;
         }
 
-        if (this.runningQueue.length < this.maximumConcurentOperations && this._hasOperations()) {
+        if (this.runningQueue.length < this.maximumConcurentOperations && this.hasOperations()) {
             const operation = this._getNextOperation();
             if (operation
                  && !operation.isExecuting
@@ -194,7 +196,7 @@ class OperationQueue extends EventEmitter {
         }
     }
 
-    _hasOperations() {
+    hasOperations() {
         return !!(this.queues[QueuePriority.veryHigh].length
         + this.queues[QueuePriority.high].length
         + this.queues[QueuePriority.normal].length
@@ -206,14 +208,23 @@ class OperationQueue extends EventEmitter {
         let operation = null;
         if (this.queues[QueuePriority.veryHigh].length) {
             operation = this.queues[QueuePriority.veryHigh].pop();
-        } else if (this.queues[QueuePriority.high].length) {
+            return operation;
+        }
+        if (this.queues[QueuePriority.high].length) {
             operation = this.queues[QueuePriority.high].pop();
-        } else if (this.queues[QueuePriority.normal].length) {
+            return operation;
+        } 
+        if (this.queues[QueuePriority.normal].length) {
             operation = this.queues[QueuePriority.normal].pop();
-        } else if (this.queues[QueuePriority.low].length) {
+            return operation;
+        } 
+        if (this.queues[QueuePriority.low].length) {
             operation = this.queues[QueuePriority.low].pop();
-        } else if (this.queues[QueuePriority.veryLow].length) {
+            return operation;
+        }
+        if (this.queues[QueuePriority.veryLow].length) {
             operation = this.queues[QueuePriority.veryLow].pop();
+            return operation;
         }
         return operation;
     }

@@ -182,6 +182,41 @@ describe('OperationQueue', () => {
             operationQueue.addOperations([operation2]);
             expect(operationQueue.runningQueue.length).toBe(2);
         });
+
+        test('should add operations seperatly, at any given time (with a longer delay this time)', async (done) => {
+            const operationQueue = new OperationQueue();
+            const operation1 = new TimeOutOperation(1500);
+            const operation2 = new TimeOutOperation(1000);
+
+            operationQueue.addOperation(operation1);
+            expect(operationQueue.runningQueue.length).toBe(1);
+
+            await delay(1);
+
+            operationQueue.addOperations([operation2]);
+            expect(operationQueue.runningQueue.length).toBe(2);
+            
+            done();
+        });
+
+        test('should add operations seperatly, at any given time and emit event DONE when all finished', async (done) => {
+            const operationQueue = new OperationQueue();
+            const operation1 = new TimeOutOperation(1500);
+            const operation2 = new TimeOutOperation(1000);
+
+            operationQueue.addOperation(operation1);
+            expect(operationQueue.runningQueue.length).toBe(1);
+
+            await delay(1);
+
+            operationQueue.addOperations([operation2]);
+            expect(operationQueue.runningQueue.length).toBe(2);
+            
+            operationQueue.on('done', queue => {
+                expect(queue.hasOperations()).toBe(false);
+                done();
+            });
+        });
     });
 
     describe('function addOperation/addOperations', () => {
