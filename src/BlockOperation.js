@@ -35,7 +35,7 @@ class BlockOperation extends Operation {
     run() {
         const promises = [];
         this.blocks.forEach(block => {
-            promises.push(block());
+            promises.push(block(this));
         });
         return Promise.all(promises);
     }
