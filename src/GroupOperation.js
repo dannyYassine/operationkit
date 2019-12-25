@@ -43,7 +43,7 @@ class GroupOperation extends Operation {
     }
 
     /**
-     * @param {Array.<Operation>} operation 
+     * @param {Array.<Operation>} operations
      */
     addOperations(operations) {
         this.operations = this.operations.concat(operations);

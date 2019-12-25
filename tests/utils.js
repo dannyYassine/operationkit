@@ -4,7 +4,7 @@ const delay = (time) => {
             resolve();
         }, time);
     });
-}
+};
 
 const nextTick = () => {
     return new Promise((resolve, reject) => {
@@ -12,9 +12,9 @@ const nextTick = () => {
             resolve();
         });
     })
-}
+};
 
 module.exports = {
     delay,
     nextTick
-}
+};

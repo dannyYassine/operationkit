@@ -2,6 +2,7 @@ const { OperationQueue } = require('../src/OperationQueue');
 const { QueueEvent } = require('../src/QueueEvent');
 const { TestOperation, TimeOutOperation } = require('./TestOperation');
 const { QueuePriority } = require('../src/QueuePriority');
+const { Operation } = require('../src/Operation');
 const { OperationEvent } = require('../src/OperationEvent');
 const { delay, nextTick } = require('./utils');
 
@@ -11,22 +12,22 @@ describe('OperationQueue', () => {
         test('should be defined', () => {
             expect(OperationQueue).toBeDefined();
         });
-    
+
         test('should be instantiated', () => {
             const operationQueue = new OperationQueue(1);
-    
+
             expect(operationQueue).toBeDefined();
         });
-    
+
         test('inherits from EventEmitter', () => {
             const operationQueue = new OperationQueue(1);
-    
+
             expect(operationQueue.__proto__.__proto__.constructor.name).toBe('EventEmitter');
         });
-    
+
         test('should be valid type', () => {
             const operationQueue = new OperationQueue(1);
-    
+
             expect(operationQueue.constructor.name).toBe('OperationQueue');
         });
     });
@@ -41,7 +42,7 @@ describe('OperationQueue', () => {
             expect(operationQueue.operations).toEqual([operation1]);
         });
     });
-  
+
     describe('function addOperations', () => {
         test('should add multiple operations to its operations prop', () => {
             const operationQueue = new OperationQueue(1);
@@ -80,7 +81,7 @@ describe('OperationQueue', () => {
             operationQueue.on(QueueEvent.PAUSED, pausedFunction)
 
             operationQueue.pause();
-            
+
             expect(pausedFunction).toHaveBeenCalled();
         });
 
@@ -150,7 +151,7 @@ describe('OperationQueue', () => {
             const operationQueue = new OperationQueue();
             operationQueue.on(QueueEvent.RESUMED, resumedFunction)
             operationQueue.pause();
-            
+
             operationQueue.resume();
 
             expect(resumedFunction).toHaveBeenCalled();
@@ -195,7 +196,7 @@ describe('OperationQueue', () => {
 
             operationQueue.addOperations([operation2]);
             expect(operationQueue.runningQueue.length).toBe(2);
-            
+
             done();
         });
 
@@ -211,7 +212,7 @@ describe('OperationQueue', () => {
 
             operationQueue.addOperations([operation2]);
             expect(operationQueue.runningQueue.length).toBe(2);
-            
+
             operationQueue.on('done', queue => {
                 expect(queue.hasOperations()).toBe(false);
                 done();
@@ -224,7 +225,7 @@ describe('OperationQueue', () => {
             const operationQueue = new OperationQueue();
             const operation1 = new TestOperation();
             const operation2 = new TestOperation();
-            
+
             operation1.dependencies = [operation2];
             operation2.dependencies = [operation1];
 
@@ -249,7 +250,7 @@ describe('OperationQueue', () => {
             const operation1 = new TimeOutOperation(500);
 
             operationQueue.addOperation(operation1)
-            
+
             expect(operationQueue.isExecuting).toBe(true);
         });
 
@@ -274,9 +275,9 @@ describe('OperationQueue', () => {
 
             operationQueue.on(QueueEvent.DONE, () => {
                 expect(operationQueue.isExecuting).toBe(false);
-                done();      
+                done();
             })
-        
+
         });
 
         test('should call done event when queue becomes empty', async (done) => {
@@ -303,7 +304,7 @@ describe('OperationQueue', () => {
 
             operationQueue.addOperation(operation1);
         });
-        
+
         test('should call promise resolve when operations are re-added', async () => {
             const operationQueue = new OperationQueue();
             const operation1 = new TestOperation();
@@ -315,7 +316,7 @@ describe('OperationQueue', () => {
 
             operationQueue.addOperation(operation1);
             operationQueue.addOperation(operation2)
-            
+
             await nextTick();
 
             expect(doneFn).toHaveBeenCalledTimes(1);
@@ -360,7 +361,7 @@ describe('OperationQueue', () => {
                 operation5,
                 operation3
             ]);
-            
+
             operationQueue.on(QueueEvent.DONE, () => {
                 expect(doneOperations[0] === operation1);
                 expect(doneOperations[1] === operation2);
@@ -433,5 +434,65 @@ describe('OperationQueue', () => {
             operationQueue.addOperation(operation);
             operation.cancel();
         });
-    })
-})
+    });
+
+    describe('function getNextOperation', () => {
+        test('should return null if no operations are in queue', () => {
+            const operationQueue = new OperationQueue();
+
+            const operation = operationQueue.getNextOperation();
+
+            expect(operation).toBe(null);
+        });
+
+        _operationDataProvider()
+          .forEach(({operation, result}) => {
+            test('should return the next operation', () => {
+                const operationQueue = new OperationQueue();
+                operationQueue.addOperation(operation);
+                operationQueue.queues[operation.queuePriority].push(operation);
+
+                const nextOperation = operationQueue.getNextOperation();
+
+                expect(nextOperation.id).toBe(result.id);
+            });
+        })
+    });
+});
+
+function _operationDataProvider() {
+    const operation1 = new Operation();
+    const operation2 = new Operation();
+    const operation3 = new Operation();
+    const operation4 = new Operation();
+    const operation5 = new Operation();
+
+    operation1.queuePriority = QueuePriority.veryHigh;
+    operation2.queuePriority = QueuePriority.high;
+    operation3.queuePriority = QueuePriority.normal;
+    operation4.queuePriority = QueuePriority.low;
+    operation5.queuePriority = QueuePriority.veryLow;
+
+    return [
+        {
+            operation: operation1,
+            result: operation1
+        },
+        {
+            operation: operation2,
+            result: operation2
+        },
+        {
+            operation: operation3,
+            result: operation3
+        },
+        {
+            operation: operation4,
+            result: operation4
+        },
+        {
+            operation: operation5,
+            result: operation5
+        }
+    ]
+}
