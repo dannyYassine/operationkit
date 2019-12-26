@@ -1,10 +1,11 @@
 
-const { Operation } = require('./Operation');
-const { OperationQueue } = require('./OperationQueue');
-const { BlockOperation } = require('./BlockOperation');
-const { GroupOperation } = require('./GroupOperation');
-const { OperationEvent } = require('./OperationEvent');
-const { QueuePriority } = require('./QueuePriority');
+const { Operation } = require('./src/Operation');
+const { OperationQueue } = require('./src/OperationQueue');
+const { BlockOperation } = require('./src/BlockOperation');
+const { GroupOperation } = require('./src/GroupOperation');
+const { OperationEvent } = require('./src/OperationEvent');
+const { QueueEvent } = require('./src/QueueEvent');
+const { QueuePriority } = require('./src/QueuePriority');
 
 module.exports = {
     Operation,
@@ -12,5 +13,6 @@ module.exports = {
     BlockOperation,
     GroupOperation,
     OperationEvent,
+    QueueEvent,
     QueuePriority
 };

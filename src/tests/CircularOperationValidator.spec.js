@@ -1,5 +1,5 @@
-const { CircularOperationValidator } = require('../src/CircularOperationValidator');
-const { Operation } = require('../src/Operation');
+const { CircularOperationValidator } = require('../CircularOperationValidator');
+const { Operation } = require('../Operation');
 
 describe('CircularOperationValidator', function () {
     test('should be defined', () => {

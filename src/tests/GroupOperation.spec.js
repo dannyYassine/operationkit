@@ -1,4 +1,4 @@
-const { GroupOperation } = require('../src/GroupOperation');
+const { GroupOperation } = require('../GroupOperation');
 const { TestOperation, TimeOutOperation } = require('./TestOperation');
 
 describe('GroupOperation', () => {

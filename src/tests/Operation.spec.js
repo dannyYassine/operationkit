@@ -1,7 +1,7 @@
-const { OperationQueue } = require('../src/OperationQueue');
-const { Operation } = require('../src/Operation');
-const { OperationEvent } = require('../src/OperationEvent');
-const { QueuePriority } = require('../src/QueuePriority');
+const { OperationQueue } = require('../OperationQueue');
+const { Operation } = require('../Operation');
+const { OperationEvent } = require('../OperationEvent');
+const { QueuePriority } = require('../QueuePriority');
 const { TestOperation } = require('./TestOperation');
 
 describe('Operation', () => {
