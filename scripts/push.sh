@@ -5,8 +5,17 @@ setup_git() {
   git config --global user.name "${TRAVIS_USERNAME}"
 }
 
+reset() {
+  > _version.txt
+}
+
 build() {
   npm run build
+}
+
+update_version() {
+  CURRENT_VERSION=$(node -p "require('./../package.json').version")
+  echo "$CURRENT_VERSION" >> _version.txt
 }
 
 commit_files() {
@@ -25,6 +34,8 @@ upload_files() {
 }
 
 setup_git
+reset
 build
+update_version
 commit_files
 upload_files

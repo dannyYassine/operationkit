@@ -14,7 +14,7 @@ const exec = util.promisify(require('child_process').exec);
         console.log('success');
         process.exit(0);
     }
-})()
+})();
 
 
 
