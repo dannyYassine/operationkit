@@ -52,16 +52,16 @@ jobs:
 
 stages:
   - name: validate-version
-    if: (branch = master) AND (commit_message != $ENV_TRAVIS_COMMIT_MESSAGE)
+    if: (branch = master) AND (commit_message != env(ENV_TRAVIS_COMMIT_MESSAGE))
   - name: install
-    if: (branch != master) AND (commit_message != $ENV_TRAVIS_COMMIT_MESSAGE)
+    if: (branch != master) AND (commit_message != env(ENV_TRAVIS_COMMIT_MESSAGE))
   - name: build
-    if: (branch != master) AND (commit_message != $ENV_TRAVIS_COMMIT_MESSAGE)
+    if: (branch != master) AND (commit_message != env(ENV_TRAVIS_COMMIT_MESSAGE))
   - name: coverage
-    if: (type = pull_request) AND (commit_message != $ENV_TRAVIS_COMMIT_MESSAGE)
+    if: (type = pull_request) AND (commit_message != env(ENV_TRAVIS_COMMIT_MESSAGE))
   - name: deploy-github
-    if: (branch = master) AND (type = push) AND (commit_message != $ENV_TRAVIS_COMMIT_MESSAGE)
+    if: (branch = master) AND (type = push) AND (commit_message != env(ENV_TRAVIS_COMMIT_MESSAGE))
   - name: deploy-npm
-    if: (branch = master) AND (type = push) AND (commit_message != $ENV_TRAVIS_COMMIT_MESSAGE)
+    if: (branch = master) AND (type = push) AND (commit_message != env(ENV_TRAVIS_COMMIT_MESSAGE))
   - name: deploy-docs
-    if: (branch = gh-pages) AND (type = push) AND (commit_message != $ENV_TRAVIS_COMMIT_MESSAGE)
+    if: (branch = gh-pages) AND (type = push) AND (commit_message != env(ENV_TRAVIS_COMMIT_MESSAGE))
