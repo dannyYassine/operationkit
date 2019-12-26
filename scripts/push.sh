@@ -14,7 +14,7 @@ build() {
 }
 
 update_version() {
-  CURRENT_VERSION=$(node -p "require('./../package.json').version")
+  CURRENT_VERSION=$(node -p "require('./package.json').version")
   echo "$CURRENT_VERSION" >> scripts/_version.txt
 }
 
