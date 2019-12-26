@@ -6,6 +6,7 @@ class QueuePriority {
 
     /**
      * Lowest priority
+     * @type {number}
      */
     get veryLow() {
         return 0;
@@ -13,6 +14,7 @@ class QueuePriority {
 
     /**
      * Low priority
+     * @type {number}
      */
     get low() {
         return 1;
@@ -20,6 +22,7 @@ class QueuePriority {
 
     /**
      * Normal priority
+     * @type {number}
      */
     get normal() {
         return 2;
@@ -27,6 +30,7 @@ class QueuePriority {
 
     /**
      * High priority
+     * @type {number}
      */
     get high() {
         return 3;
@@ -34,6 +38,7 @@ class QueuePriority {
 
     /**
      * Highest priority
+     * @type {number}
      */
     get veryHigh() {
         return 4;
@@ -41,7 +46,7 @@ class QueuePriority {
 
     /**
      * Validates QueuePriority assignment value
-     * @param {number} value 
+     * @param {QueuePriority|number} value
      */
     isValid(value) {
         return value >= this.veryLow && value <= this.veryHigh;

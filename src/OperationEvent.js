@@ -6,6 +6,7 @@ class OperationEvent {
 
     /**
      * Event when operation starts
+     * @returns {string}
      */
     get START() {
         return 'start';
@@ -13,6 +14,7 @@ class OperationEvent {
 
     /**
      * Event when operation is ready to be executed
+     * @returns {string}
      */
     get READY() {
         return 'ready';
@@ -20,6 +22,7 @@ class OperationEvent {
 
     /**
      * Event when operation is done
+     * @returns {string}
      */
     get DONE() {
         return 'done';
@@ -27,6 +30,7 @@ class OperationEvent {
 
     /**
      * Event when operation is cancelled
+     * @returns {string}
      */
     get CANCEL() {
         return 'cancel';
@@ -34,6 +38,7 @@ class OperationEvent {
 
     /**
      * Event when something went wrong
+     * @returns {string}
      */
     get ERROR() {
         return 'e';

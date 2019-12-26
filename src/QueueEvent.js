@@ -6,6 +6,7 @@ class QueueEvent {
 
     /**
      * DONE Event
+     * @returns {string}
      */
     get DONE() {
         return 'done';
@@ -13,6 +14,7 @@ class QueueEvent {
 
     /**
      * PAUSED Event
+     * @returns {string}
      */
     get PAUSED() {
         return 'paused';
@@ -20,6 +22,7 @@ class QueueEvent {
 
     /**
      * RESUMED Event
+     * @returns {string}
      */
     get RESUMED() {
         return 'resumed';
@@ -28,4 +31,4 @@ class QueueEvent {
 
 module.exports = {
     QueueEvent: new QueueEvent()
-}
+};

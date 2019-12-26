@@ -83,7 +83,7 @@ describe('BlockOperation', () => {
     
             expect(runFunction).toHaveBeenCalled();
         });
-    })
+    });
 
     describe('function addBlock', () => {
         test('should add new function block', () => {
@@ -118,5 +118,15 @@ describe('BlockOperation', () => {
     
             expect(operation.blocks.length).toEqual(1);
         });
-    })
+    });
+
+    describe('function run', () => {
+        test('pass operation object to function block', async () => {
+            const operation = new BlockOperation((op) => {
+                expect(op).toEqual(operation);
+            });
+
+            await operation.start();
+        });
+    });
 });

@@ -13,7 +13,7 @@ const { copyArray, isObjectEmpty } = require('./utils');
 class Operation extends EventEmitter {
 
     /**
-     * @param {number} id 
+     * @param {number} [id]
      */
     constructor(id) {
         super();
@@ -44,7 +44,7 @@ class Operation extends EventEmitter {
 
     /**
      * @description Getter returning if Operation finished its task
-     * @type {boolean}
+     * @returns {boolean}
      */
     get isFinished() {
         return this._done;
@@ -52,7 +52,7 @@ class Operation extends EventEmitter {
 
     /**
      * @description Knowing if operation was cancelled
-     * @type {boolean}
+     * @returns {boolean}
      */
     get isCancelled() {
         return this._cancelled;
@@ -60,6 +60,7 @@ class Operation extends EventEmitter {
 
     /**
      * Setter for isInQueue value
+     * @param {boolean} value
      */
     set isInQueue(value) {
         this._isInQueue = value;
@@ -75,6 +76,7 @@ class Operation extends EventEmitter {
     /**
      * Setter for queuePriority value.
      * It is only settable when operation has not yet executed, cancelled or finished
+     * @param {QueuePriority|number} value
      */
     set queuePriority(value) {
         if (this.isExecuting || this.isCancelled || this.isFinished) {
@@ -88,6 +90,7 @@ class Operation extends EventEmitter {
 
     /**
      * Getter for queuePriority value
+     * @returns {QueuePriority|number}
      */
     get queuePriority() {
         return this._queuePriority;
@@ -96,18 +99,20 @@ class Operation extends EventEmitter {
     /**
      * Setter for dependencies value.
      * It is only settable when operation has not yet executed, cancelled or finished
+     * @param {Array.<Operation>} operations
      */
-    set dependencies(value) {
+    set dependencies(operations) {
         if (this.isExecuting || this.isCancelled || this.isFinished) {
             return;
         }
 
-        this._dependencies = value;
+        this._dependencies = operations;
     }
 
     /**
      * Getter for dependencies value.
-     * When operation is executing, cancelled, or finihsed, this returns a copy
+     * When operation is executing, cancelled, or finished, this returns a copy
+     * @returns {Array.<Operation>}
      */
     get dependencies() {
         if (this.isExecuting || this.isCancelled || this.isFinished) {
@@ -198,6 +203,9 @@ class Operation extends EventEmitter {
         return this.promise;
     }
 
+    /**
+     * @protected
+     */
     main() {
         this.isExecuting = true;
         this.emit(OperationEvent.START, this);
@@ -261,7 +269,6 @@ class Operation extends EventEmitter {
             }
         }
     }
-
 }
 
 module.exports = {

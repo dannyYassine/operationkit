@@ -91,7 +91,7 @@ class OperationQueue extends EventEmitter {
 
     /**
      * Getter
-     * @returns {boolean|*}
+     * @returns {boolean}
      */
     get isPaused() {
         return this._paused;
@@ -183,7 +183,7 @@ class OperationQueue extends EventEmitter {
         }
 
         if (this.runningQueue.length < this.maximumConcurentOperations && this.hasOperations()) {
-            const operation = this._getNextOperation();
+            const operation = this.getNextOperation();
             if (operation
                  && !operation.isExecuting
                  || !operation.isCancelled
@@ -196,6 +196,9 @@ class OperationQueue extends EventEmitter {
         }
     }
 
+    /**
+     * @returns {boolean}
+     */
     hasOperations() {
         return !!(this.queues[QueuePriority.veryHigh].length
         + this.queues[QueuePriority.high].length
@@ -204,7 +207,12 @@ class OperationQueue extends EventEmitter {
         + this.queues[QueuePriority.veryLow].length);
     }
 
-    _getNextOperation() {
+    /**
+     * Returns the next operation to be executed
+     *
+     * @returns {?Operation}
+     */
+    getNextOperation() {
         let operation = null;
         if (this.queues[QueuePriority.veryHigh].length) {
             operation = this.queues[QueuePriority.veryHigh].pop();

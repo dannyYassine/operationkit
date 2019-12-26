@@ -8,8 +8,11 @@ class CircularOperationValidatorError extends Error {
 
 class CircularOperationValidator {
 
+    /**
+     * @param {Array.<Operation>} operations
+     */
     constructor(operations) {
-        this.operations = operations
+        this.operations = operations;
         this._checkCircular();
     }
 
@@ -32,6 +35,11 @@ class CircularOperationValidator {
         })
     }
 
+    /**
+     * @param {Operation} op
+     * @param map
+     * @private
+     */
     _verifyOpMap(op, map) {
         if (map[op.id] !== undefined) {
             this._throwError(op, map)
