@@ -5,7 +5,6 @@ cache: npm
 branches:
   only:
   - master
-  - next
   - gh-pages
   
 jobs:
@@ -53,13 +52,16 @@ jobs:
 
 stages:
   - name: validate-version
-    if: (branch = master)
+    if: (branch = master) AND ($TRAVIS_COMMIT_MESSAGE != $ENV_TRAVIS_COMMIT_MESSAGE)
   - name: install
+    if: ($TRAVIS_COMMIT_MESSAGE != $ENV_TRAVIS_COMMIT_MESSAGE)
   - name: build
+    if: ($TRAVIS_COMMIT_MESSAGE != $ENV_TRAVIS_COMMIT_MESSAGE)
   - name: coverage
+    if: ($TRAVIS_COMMIT_MESSAGE != $ENV_TRAVIS_COMMIT_MESSAGE)
   - name: deploy-github
-    if: (branch = master) AND (type = push)
+    if: (branch = master) AND (type = push) AND ($TRAVIS_COMMIT_MESSAGE != $ENV_TRAVIS_COMMIT_MESSAGE)
   - name: deploy-npm
-    if: (branch = master) AND (type = push)
+    if: (branch = master) AND (type = push) AND ($TRAVIS_COMMIT_MESSAGE != $ENV_TRAVIS_COMMIT_MESSAGE)
   - name: deploy-docs
-    if: (branch = gh-pages) AND (type = push)
+    if: (branch = gh-pages) AND (type = push) AND ($TRAVIS_COMMIT_MESSAGE != $ENV_TRAVIS_COMMIT_MESSAGE)

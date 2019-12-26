@@ -2,7 +2,7 @@
 
 setup_git() {
   git config --global user.email "${ENV_EMAIL}"
-  git config --global user.name "Travis CI"
+  git config --global user.name "${TRAVIS_USERNAME}"
 }
 
 build() {
@@ -17,7 +17,7 @@ commit_files() {
   git add dist/operationkit.min.js.map
   ls -al
   git status
-  git commit --message "Travis build: ${TRAVIS_BUILD_NUMBER}; Updating operationkit.min.js"
+  git commit --message "${ENV_TRAVIS_COMMIT_MESSAGE}"
 }
 
 upload_files() {
