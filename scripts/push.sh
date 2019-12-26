@@ -15,7 +15,7 @@ build() {
 
 update_version() {
   CURRENT_VERSION=$(node -p "require('./../package.json').version")
-  echo "$CURRENT_VERSION" >> _version.txt
+  echo "$CURRENT_VERSION" >> scripts/_version.txt
 }
 
 commit_files() {
@@ -24,6 +24,7 @@ commit_files() {
   git status
   git add dist/operationkit.min.js
   git add dist/operationkit.min.js.map
+  git add scripts/_version.txt
   ls -al
   git status
   git commit --message "[travis-ci skip] Travis build: ${TRAVIS_BUILD_NUMBER}; Updating operationkit.min.js"
