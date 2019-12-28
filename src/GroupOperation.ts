@@ -1,10 +1,15 @@
-const { Operation } = require('./Operation');
-const { OperationQueue } = require('./OperationQueue');
+import { Operation } from './Operation';
+import { OperationQueue } from './OperationQueue';
+
+type GroupResult = any[];
 
 /**
  * @class GroupOperation
  */
-class GroupOperation extends Operation {
+export class GroupOperation<U> extends Operation<any> {
+
+    public operations: Operation<any>[];
+    public queue: OperationQueue;
 
     constructor() {
         super();
@@ -17,13 +22,14 @@ class GroupOperation extends Operation {
      * 
      * @returns {Promise}
      */
-    async run() {
+    public async run(): Promise<GroupResult> {
         await this.queue.addOperations(this.operations);
 
+        const accum: GroupResult = [];
         return this.operations.reduce((accum, operation) => {
             accum.push(operation.result);
             return accum;
-        }, []);           
+        }, accum);
     }
 
     /**
@@ -50,7 +56,3 @@ class GroupOperation extends Operation {
         this.dependencies = [];
     }
 }
-
-module.exports = {
-    GroupOperation
-};
