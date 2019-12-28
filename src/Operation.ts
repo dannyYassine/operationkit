@@ -1,7 +1,7 @@
 import {QueuePriority} from './QueuePriority';
 
 import {EventEmitter} from 'events';
-import {v4 as uuidv4} from 'uuid';
+import { v4 as uuidv4 } from 'uuid';
 
 import {OperationEvent} from './OperationEvent';
 import {copyArray, isObjectEmpty} from './utils';

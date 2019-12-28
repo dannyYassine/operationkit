@@ -6,7 +6,7 @@ type BlockResult = any[] | any;
  * Operation Subclass that accepts a function as an argument which will be the task to run.
  * Additionally, multiple functions can be appended to run simultaneously as the same task.
  */
-class BlockOperation extends Operation<any> {
+export class BlockOperation extends Operation<any> {
 
     public blocks: Function[];
 
@@ -54,7 +54,3 @@ class BlockOperation extends Operation<any> {
         this.blocks.push(block);
     }
 }
-
-module.exports = {
-    BlockOperation
-};
