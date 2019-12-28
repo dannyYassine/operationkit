@@ -55,9 +55,9 @@ stages:
   - name: validate-version
     if: (branch = master)
   - name: install
-    if: (branch != master)
+    if: (type = pull_request)
   - name: build
-    if: (branch != master)
+    if: (type = pull_request)
   - name: coverage
     if: (type = pull_request)
   - name: deploy-github

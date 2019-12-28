@@ -15,6 +15,6 @@ module.exports = {
   plugins: [
     new webpack.ProvidePlugin({
         operationkit: 'operationkit',
-    })     
+    })
 ]
 };

@@ -1,4 +1,4 @@
-const { Operation } = require('../src/Operation');
+const { Operation } = require('../Operation');
 const { delay } = require('./utils');
 
 class TestOperation extends Operation {

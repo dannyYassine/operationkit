@@ -1,5 +1,5 @@
-const { copyArray, copyObject, isObjectEmpty } = require('../src/utils');
-const { Operation } = require('../src/Operation');
+const { copyArray, copyObject, isObjectEmpty } = require('../utils');
+const { Operation } = require('../Operation');
 const { TimeOutOperation } = require('./TestOperation');
 
 describe('function copyArray', function () {

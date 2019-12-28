@@ -1,9 +1,9 @@
-const { OperationQueue } = require('../src/OperationQueue');
-const { QueueEvent } = require('../src/QueueEvent');
+const { OperationQueue } = require('../OperationQueue');
+const { QueueEvent } = require('../QueueEvent');
 const { TestOperation, TimeOutOperation } = require('./TestOperation');
-const { QueuePriority } = require('../src/QueuePriority');
-const { Operation } = require('../src/Operation');
-const { OperationEvent } = require('../src/OperationEvent');
+const { QueuePriority } = require('../QueuePriority');
+const { Operation } = require('../Operation');
+const { OperationEvent } = require('../OperationEvent');
 const { delay, nextTick } = require('./utils');
 
 describe('OperationQueue', () => {
