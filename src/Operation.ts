@@ -1,21 +1,41 @@
-const EventEmitter = require('events')
-const uuidv4 = require('uuid/v4');
+import {QueuePriority} from './QueuePriority';
 
-const { OperationEvent } = require('./OperationEvent');
-const { QueuePriority } = require('./QueuePriority');
-const { copyArray, isObjectEmpty } = require('./utils');
+import {EventEmitter} from 'events';
+import { v4 as uuidv4 } from 'uuid';
+
+import {OperationEvent} from './OperationEvent';
+import {copyArray, isObjectEmpty} from './utils';
 
 /**
  * @class Operation
  * @constructor Operation
  * @description Abstract class which runs a single task
  */
-class Operation extends EventEmitter {
+export abstract class Operation<T> extends EventEmitter {
+
+    public id: string;
+    public result: T;
+    public name: string;
+    public completionCallback?: Function;
+    public map: Object;
+    public isExecuting: boolean;
+    public error: boolean;
+    public promise?: Promise<any>;
+    public runPromise?: Promise<any>;
+
+    private _dependencies: Operation<any>[];
+    private _done: boolean;
+    private _isInQueue: boolean;
+    private _canStart: boolean;
+    private _cancelled: boolean;
+    private _resolve: Function;
+    private _reject: Function;
+    private _queuePriority: QueuePriority = QueuePriority.normal;
 
     /**
      * @param {number} [id]
      */
-    constructor(id) {
+    constructor(id = null) {
         super();
         
         if (!id) {
@@ -36,7 +56,6 @@ class Operation extends EventEmitter {
         this._isInQueue = false;
         this._canStart = false;
         this._cancelled = false;
-        this._queuePriority = QueuePriority.normal;
 
         this._resolve = null;
         this._reject = null;
@@ -46,7 +65,7 @@ class Operation extends EventEmitter {
      * @description Getter returning if Operation finished its task
      * @returns {boolean}
      */
-    get isFinished() {
+    get isFinished(): boolean {
         return this._done;
     }
 
@@ -54,7 +73,7 @@ class Operation extends EventEmitter {
      * @description Knowing if operation was cancelled
      * @returns {boolean}
      */
-    get isCancelled() {
+    get isCancelled(): boolean {
         return this._cancelled;
     }
 
@@ -69,21 +88,20 @@ class Operation extends EventEmitter {
     /**
      * Getter for isInQueue value
      */
-    get isInQueue() {
+    get isInQueue(): boolean {
         return this._isInQueue;
     }
 
     /**
      * Setter for queuePriority value.
      * It is only settable when operation has not yet executed, cancelled or finished
-     * @param {QueuePriority|number} value
+     * @param {QueuePriority} value
      */
-    set queuePriority(value) {
+    set queuePriority(value: QueuePriority) {
         if (this.isExecuting || this.isCancelled || this.isFinished) {
             return;
         }
-
-        if (QueuePriority.isValid(value)) {
+        if (value in QueuePriority) {
             this._queuePriority = value;
         }
     }
@@ -92,7 +110,7 @@ class Operation extends EventEmitter {
      * Getter for queuePriority value
      * @returns {QueuePriority|number}
      */
-    get queuePriority() {
+    get queuePriority(): QueuePriority {
         return this._queuePriority;
     }
 
@@ -101,7 +119,7 @@ class Operation extends EventEmitter {
      * It is only settable when operation has not yet executed, cancelled or finished
      * @param {Array.<Operation>} operations
      */
-    set dependencies(operations) {
+    set dependencies(operations: Operation<any>[]) {
         if (this.isExecuting || this.isCancelled || this.isFinished) {
             return;
         }
@@ -114,7 +132,7 @@ class Operation extends EventEmitter {
      * When operation is executing, cancelled, or finished, this returns a copy
      * @returns {Array.<Operation>}
      */
-    get dependencies() {
+    get dependencies(): Operation<any>[] {
         if (this.isExecuting || this.isCancelled || this.isFinished) {
             return copyArray(this._dependencies);
         }
@@ -122,10 +140,17 @@ class Operation extends EventEmitter {
     }
 
     /**
+     * @abstract
+     * @description Needs to be implemented by sub-class
+     *  This is the task to be executed
+     */
+    abstract async run(): Promise<T>;
+
+    /**
      * @description Cancels the operation if the operation has not started.
      * @returns {undefined}
      */
-    cancel() {
+    public cancel(): void {
         this._cancelled = true;
         Promise.resolve(this.promise);
         this.emit(OperationEvent.CANCEL, this);
@@ -136,7 +161,7 @@ class Operation extends EventEmitter {
      * @description Sets the operation as done. This is usually called internally or by the operationQueue
      * @returns {undefined}
      */
-    done() {
+    public done(): void {
         this._done = true;
         this.completionCallback && this.completionCallback(this);
         this.emit(OperationEvent.DONE, this);
@@ -147,7 +172,7 @@ class Operation extends EventEmitter {
      * @description Knowing if operation finished its task
      * @returns {boolean} 
      */
-    isDone() {
+    public isDone(): boolean {
         return this._done;
     }
 
@@ -155,7 +180,7 @@ class Operation extends EventEmitter {
      * Adds an operation as a dependency
      * @param {Operation} dependency 
      */
-    addDependency(dependency) {
+    public addDependency(dependency: Operation<any>): void {
         this._dependencies.push(dependency);
     }
 
@@ -163,17 +188,8 @@ class Operation extends EventEmitter {
      * Removes an operation as a dependency
      * @param {Operation} dependency 
      */
-    removeDependency(dependency) {
+    public removeDependency(dependency: Operation<any>): void {
         this._dependencies = this._dependencies.filter(operation => operation.id !== dependency.id)
-    }
-
-    /**
-     * @abstract
-     * @description Needs to be implemented by sub-class
-     *  This is the task to be executed
-     */
-    async run() {
-        throw new Error('run function must be implemented');
     }
 
     /**
@@ -182,7 +198,7 @@ class Operation extends EventEmitter {
      * in order to run. Calling this method multiples times will simply re-evaluate it's readiness
      * @returns {Promise} 
      */
-    start() {
+    public start(): Promise<T> {
         if (this.isExecuting || this.isCancelled || this.isFinished) {
             return this.promise;
         } else if (this.promise && !this._canStart) {
@@ -204,9 +220,8 @@ class Operation extends EventEmitter {
     }
 
     /**
-     * @protected
      */
-    main() {
+    public main(): void {
         this.isExecuting = true;
         this.emit(OperationEvent.START, this);
         this.runPromise = this.run()
@@ -223,7 +238,7 @@ class Operation extends EventEmitter {
             });
     }
 
-    _preProcessStart() {
+    private _preProcessStart(): void {
         this._createMap();
 
         if (this._canStart) {
@@ -235,7 +250,7 @@ class Operation extends EventEmitter {
         }
     }
 
-    _createMap() {
+    private _createMap(): void {
         if (!this._dependencies.length) {
             this._canStart = true;
             return;
@@ -249,12 +264,12 @@ class Operation extends EventEmitter {
 
     }
 
-    _onDependantOperationDone(operation) {
+    private _onDependantOperationDone(operation): void {
         delete this.map[operation.id];
         this._tryStart();
     }
 
-    _tryStart() {
+    private _tryStart(): void {
         if (this.isExecuting || this.isCancelled || this.isFinished) {
             return;
         }
@@ -270,7 +285,3 @@ class Operation extends EventEmitter {
         }
     }
 }
-
-module.exports = {
-    Operation
-};

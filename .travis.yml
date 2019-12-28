@@ -5,6 +5,7 @@ cache: npm
 branches:
   only:
   - master
+  - next
   - gh-pages
   
 jobs:

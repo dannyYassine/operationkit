@@ -19,7 +19,6 @@ describe('BlockOperation', () => {
             const operation = new BlockOperation(1, () => {
                 return true;
             });
-    
             expect(operation.__proto__.__proto__.constructor.name).toBe('Operation');
         });
     
@@ -109,14 +108,6 @@ describe('BlockOperation', () => {
             expect(mockBlock1).toHaveBeenCalled();
             expect(mockBlock2).toHaveBeenCalled();
             expect(mockBlock3).toHaveBeenCalled();
-        });
-
-        test('should not add function block if not of function type', () => {
-            const operation = new BlockOperation(() => {});
-
-            operation.addBlock('this is not a function');
-    
-            expect(operation.blocks.length).toEqual(1);
         });
     });
 

@@ -213,7 +213,7 @@ describe('OperationQueue', () => {
             operationQueue.addOperations([operation2]);
             expect(operationQueue.runningQueue.length).toBe(2);
 
-            operationQueue.on('done', queue => {
+            operationQueue.on(QueueEvent.DONE, queue => {
                 expect(queue.hasOperations()).toBe(false);
                 done();
             });
@@ -324,7 +324,7 @@ describe('OperationQueue', () => {
 
         test('should set order queue priority of operations', (done) => {
             const operationQueue = new OperationQueue();
-            operationQueue.maximumConcurentOperations = 1;
+            operationQueue.maximumConcurrentOperations = 1;
 
             const operation1 = new TestOperation();
             operation1.queuePriority = QueuePriority.veryHigh;
@@ -376,7 +376,7 @@ describe('OperationQueue', () => {
     describe('function completionCallback', () => {
         test('should call completionCallback when operationQueue finished running operations', async (done) => {
             const operationQueue = new OperationQueue();
-            operationQueue.maximumConcurentOperations = 1;
+            operationQueue.maximumConcurrentOperations = 1;
             operationQueue.completionCallback = () => {
                 done();
             }
@@ -387,7 +387,7 @@ describe('OperationQueue', () => {
 
         test('should always call completionCallback multiple times when operationQueue finished running operations', async (done) => {
             const operationQueue = new OperationQueue();
-            operationQueue.maximumConcurentOperations = 1;
+            operationQueue.maximumConcurrentOperations = 1;
             const doneFunction = jest.fn(() => {
 
                 if (doneFunction.mock.calls.length === 1) {
@@ -408,7 +408,7 @@ describe('OperationQueue', () => {
     describe('function cancel', () => {
         test('can cancel an operation waiting to be executed in queue', async () => {
             const operationQueue = new OperationQueue();
-            operationQueue.maximumConcurentOperations = 1;
+            operationQueue.maximumConcurrentOperations = 1;
 
             const operation1 = new TimeOutOperation(1000);
             const operation2 = new TestOperation();
@@ -424,7 +424,7 @@ describe('OperationQueue', () => {
 
         test('cancel last operation to end queue', async (done) => {
             const operationQueue = new OperationQueue();
-            operationQueue.maximumConcurentOperations = 1;
+            operationQueue.maximumConcurrentOperations = 1;
             const doneFunction = jest.fn(() => {
                 done();
             });

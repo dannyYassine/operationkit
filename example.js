@@ -76,7 +76,7 @@ blockOperation6.completionCallback = (operation) => {
 // }
 
 const operationQueue = new OperationQueue();
-operationQueue.maximumConcurentOperations = 10;
+operationQueue.maximumConcurrentOperations = 10;
 // operationQueue.addOperation(operation);
 // operationQueue.addOperation(operation3);
 // operationQueue.completionCallback = () => {

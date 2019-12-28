@@ -3,5 +3,9 @@ coverage
 .coveralls.yml
 .idea
 .temp
-
+dist/*.ts
+dist/*.js
+dist/*.js.map
+!dist/operationkit.min.js
+!dist/operationkit.min.js.map
 jsdocs

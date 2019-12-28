@@ -1,10 +1,14 @@
-const { Operation } = require('./Operation');
+import { Operation } from './Operation';
+
+type BlockResult = any[] | any;
 
 /**
  * Operation Subclass that accepts a function as an argument which will be the task to run.
  * Additionally, multiple functions can be appended to run simultaneously as the same task.
  */
-class BlockOperation extends Operation {
+export class BlockOperation extends Operation<any> {
+
+    public blocks: Function[];
 
     constructor() {
         let id;
@@ -28,29 +32,25 @@ class BlockOperation extends Operation {
     }
 
     /**
-     * @override
      *
-     * @ignore
      */
-    run() {
-        const promises = [];
+    async run(): Promise<BlockResult> {
+        const promises: any[] = [];
         this.blocks.forEach(block => {
             promises.push(block(this));
         });
-        return Promise.all(promises);
+
+        const results: any[] = await Promise.all(promises);
+        return results.length === 1
+            ? results[0]
+            : results;
     }
 
     /**
      * Append another function to run simultaneously as the same task
      * @param {function} block - function to add 
      */
-    addBlock(block) {
-        if (typeof block === 'function') {
-            this.blocks.push(block);
-        }
+    addBlock(block: Function) {
+        this.blocks.push(block);
     }
 }
-
-module.exports = {
-    BlockOperation
-};

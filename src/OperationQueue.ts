@@ -1,13 +1,30 @@
-const EventEmitter = require('events')
-const { CircularOperationValidator } = require('./CircularOperationValidator');
-const { QueuePriority } = require('./QueuePriority');
-const { QueueEvent } = require('./QueueEvent');
-const { isObjectEmpty } = require('./utils');
+import { EventEmitter } from 'events';
+import { CircularOperationValidator } from './CircularOperationValidator';
+import { OperationEvent} from './OperationEvent';
+import { QueuePriority } from './QueuePriority';
+import { QueueEvent } from './QueueEvent';
+import { isObjectEmpty } from './utils';
+import { Operation } from './Operation';
 
 /**
  * @class OperationQueue
  */
-class OperationQueue extends EventEmitter {
+export class OperationQueue extends EventEmitter {
+
+    public map: Object;
+    public operations: Operation<any>[];
+    public resolve: Function;
+    public reject: Function;
+    public completionCallback: Function;
+    public maximumConcurrentOperations: number;
+    public readyQueueMap: Object;
+    public readyQueue: Object;
+    public runningQueueMap: Object;
+    public runningQueue: Operation<any>[];
+    public queues: Object;
+    public promise: Promise<any>;
+    private _paused:boolean;
+    private _processedOperations: Operation<any>[];
 
     constructor() {
         super();
@@ -16,7 +33,7 @@ class OperationQueue extends EventEmitter {
         this._processedOperations = [];
         this.resolve = null;
         this.completionCallback = null;
-        this.maximumConcurentOperations = 10;
+        this.maximumConcurrentOperations = 10;
 
         this.readyQueueMap = {};
         this.readyQueue = [];
@@ -24,13 +41,12 @@ class OperationQueue extends EventEmitter {
         this.runningQueueMap = {};
         this.runningQueue = [];
 
-        this.queues = {
-            [QueuePriority.veryHigh]: [],
-            [QueuePriority.high]: [],
-            [QueuePriority.normal]: [],
-            [QueuePriority.low]: [],
-            [QueuePriority.veryLow]: []
-        }
+        this.queues = {};
+        this.queues[QueuePriority.high] = [];
+        this.queues[QueuePriority.normal] = [];
+        this.queues[QueuePriority.low] = [];
+        this.queues[QueuePriority.veryLow] = [];
+        this.queues[QueuePriority.veryHigh] = [];
     }
 
     /**
@@ -52,14 +68,14 @@ class OperationQueue extends EventEmitter {
     /**
      * @param {Operation} operation
      */
-    addOperation(operation) {
-        this.addOperations([operation]);
+    addOperation(operation: Operation<any>): Promise<any> {
+        return this.addOperations([operation]);
     }
 
     /**
      * @param {Array.<Operation>} operations
      */
-    addOperations(operations) {
+    addOperations(operations: Operation<any>[]): Promise<any> {
         this.operations = this.operations.concat(operations);
         this._preProcessOperations(operations);
         this._processedOperations = this._processedOperations.concat(this.operations);
@@ -71,7 +87,7 @@ class OperationQueue extends EventEmitter {
     /**
      * Pauses the queue, no new operations will be added to the queue
      */
-    pause() {
+    pause(): void {
         if (!this._paused) {
             this._paused = true;
             this.emit(QueueEvent.PAUSED, this);
@@ -81,7 +97,7 @@ class OperationQueue extends EventEmitter {
     /**
      * Resumes the queue from an paused state
      */
-    resume() {
+    resume(): void {
         if (this._paused) {
             this._paused = false;
             this.emit(QueueEvent.RESUMED, this);
@@ -93,18 +109,18 @@ class OperationQueue extends EventEmitter {
      * Getter
      * @returns {boolean}
      */
-    get isPaused() {
+    get isPaused(): boolean {
         return this._paused;
     }
 
-    _preProcessOperations(operations) {
+    private _preProcessOperations(operations: Operation<any>[]) {
         try {
             new CircularOperationValidator(operations);
         } catch (e) {
             throw e;
         }
 
-        operations.forEach(op => {
+        operations.forEach((op: Operation<any>) => {
             if (!this.map[op.id]) {
                 this.map[op.id] = true;
                 op.isInQueue = true;
@@ -114,58 +130,59 @@ class OperationQueue extends EventEmitter {
         });
     }
 
-    _bindOperation(operation) {
-        operation.on('start', this._onOperationStart.bind(this));
-        operation.on('ready', this._onOperationReady.bind(this));
-        operation.on('cancel', this._onOperationCancel.bind(this));
-        operation.on('done', this._onOperationDone.bind(this));
+    private _bindOperation(operation: Operation<any>) {
+        operation.on(OperationEvent.START, this._onOperationStart.bind(this));
+        operation.on(OperationEvent.READY, this._onOperationReady.bind(this));
+        operation.on(OperationEvent.CANCEL, this._onOperationCancel.bind(this));
+        operation.on(OperationEvent.DONE, this._onOperationDone.bind(this));
     }
 
-    _unbindOperation(operation) {
-        operation.off('start', this._onOperationStart.bind(this));
-        operation.off('ready', this._onOperationReady.bind(this));
-        operation.off('cancel', this._onOperationCancel.bind(this));
-        operation.off('done', this._onOperationDone.bind(this));
+    private _unbindOperation(operation: Operation<any>) {
+        operation.off(OperationEvent.START, this._onOperationStart.bind(this));
+        operation.off(OperationEvent.READY, this._onOperationReady.bind(this));
+        operation.off(OperationEvent.CANCEL, this._onOperationCancel.bind(this));
+        operation.off(OperationEvent.DONE, this._onOperationDone.bind(this));
     }
 
-    _begin() {
+    private _begin() {
         if (this.promise) {
             this._startOperations();
         } else {
             this.promise = new Promise((resolve, reject) => {
-            
+
                 this.resolve = resolve;
+                this.reject = reject;
 
                 this._startOperations();
             });
         }
     }
 
-    _startOperations() {
+    private _startOperations() {
         this._processedOperations.forEach(operation => {
             this._startOperation(operation);
         });
     }
 
-    _startOperation(operation) {
+    private _startOperation(operation: Operation<any>) {
         operation.start();
     }
 
-    _onOperationStart(operation) {
-        //
+    private _onOperationStart(operation): void {
+
     }
 
-    _onOperationReady(operation) {
+    private _onOperationReady(operation: Operation<any>): void {
         this.readyQueueMap[operation.id] = true;
         this.queues[operation.queuePriority].push(operation);
-        this._checkNextOperation() 
+        this._checkNextOperation()
     }
 
-    _onOperationDone(operation) {
+    private _onOperationDone(operation: Operation<any>): void {
         this._unbindOperation(operation);
 
         this.runningQueue = this.runningQueue.filter(op => op.id !== operation.id);
-        
+
         delete this.map[operation.id];
         delete this.runningQueueMap[operation.id];
 
@@ -177,17 +194,17 @@ class OperationQueue extends EventEmitter {
         }
     }
 
-    _checkNextOperation() {
+    private _checkNextOperation(): void {
         if (this._paused) {
             return;
         }
 
-        if (this.runningQueue.length < this.maximumConcurentOperations && this.hasOperations()) {
+        if (this.runningQueue.length < this.maximumConcurrentOperations && this.hasOperations()) {
             const operation = this.getNextOperation();
             if (operation
-                 && !operation.isExecuting
-                 || !operation.isCancelled
-                 || !this.runningQueueMap[operation.id]) {
+                && !operation.isExecuting
+                || !operation.isCancelled
+                || !this.runningQueueMap[operation.id]) {
                 this.runningQueueMap[operation.id] = true;
                 this.runningQueue.push(operation);
                 operation.main();
@@ -199,12 +216,12 @@ class OperationQueue extends EventEmitter {
     /**
      * @returns {boolean}
      */
-    hasOperations() {
+    public hasOperations(): boolean {
         return !!(this.queues[QueuePriority.veryHigh].length
-        + this.queues[QueuePriority.high].length
-        + this.queues[QueuePriority.normal].length
-        + this.queues[QueuePriority.low].length
-        + this.queues[QueuePriority.veryLow].length);
+            + this.queues[QueuePriority.high].length
+            + this.queues[QueuePriority.normal].length
+            + this.queues[QueuePriority.low].length
+            + this.queues[QueuePriority.veryLow].length);
     }
 
     /**
@@ -212,7 +229,7 @@ class OperationQueue extends EventEmitter {
      *
      * @returns {?Operation}
      */
-    getNextOperation() {
+    public getNextOperation(): Operation<any> {
         let operation = null;
         if (this.queues[QueuePriority.veryHigh].length) {
             operation = this.queues[QueuePriority.veryHigh].pop();
@@ -221,11 +238,11 @@ class OperationQueue extends EventEmitter {
         if (this.queues[QueuePriority.high].length) {
             operation = this.queues[QueuePriority.high].pop();
             return operation;
-        } 
+        }
         if (this.queues[QueuePriority.normal].length) {
             operation = this.queues[QueuePriority.normal].pop();
             return operation;
-        } 
+        }
         if (this.queues[QueuePriority.low].length) {
             operation = this.queues[QueuePriority.low].pop();
             return operation;
@@ -237,7 +254,7 @@ class OperationQueue extends EventEmitter {
         return operation;
     }
 
-    _onOperationCancel(operation) {
+    private _onOperationCancel(operation: Operation<any>): void {
         delete this.map[operation.id];
         delete this.queues[operation.queuePriority];
         this.operations = this.operations.filter(op => op.id !== operation.id);
@@ -248,7 +265,3 @@ class OperationQueue extends EventEmitter {
     }
 
 }
-
-module.exports = {
-    OperationQueue
-};
