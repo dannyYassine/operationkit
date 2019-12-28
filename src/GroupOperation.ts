@@ -6,7 +6,7 @@ type GroupResult = any[];
 /**
  * @class GroupOperation
  */
-export class GroupOperation extends Operation<any> {
+export class GroupOperation<U> extends Operation<any> {
 
     public operations: Operation<any>[];
     public queue: OperationQueue;

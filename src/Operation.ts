@@ -1,10 +1,10 @@
-import { QueuePriority } from './QueuePriority';
+import {QueuePriority} from './QueuePriority';
 
-import { EventEmitter } from 'events';
-import { uuidv4 } from 'uuid/v4';
+import {EventEmitter} from 'events';
+import {v4 as uuidv4} from 'uuid';
 
-import { OperationEvent } from './OperationEvent';
-import { copyArray, isObjectEmpty } from './utils';
+import {OperationEvent} from './OperationEvent';
+import {copyArray, isObjectEmpty} from './utils';
 
 /**
  * @class Operation
@@ -14,6 +14,7 @@ import { copyArray, isObjectEmpty } from './utils';
 export abstract class Operation<T> extends EventEmitter {
 
     public id: string;
+    public result: T;
     public name: string;
     public completionCallback?: Function;
     public map: Object;
@@ -21,7 +22,6 @@ export abstract class Operation<T> extends EventEmitter {
     public error: boolean;
     public promise?: Promise<any>;
     public runPromise?: Promise<any>;
-    public result: T;
 
     private _dependencies: Operation<any>[];
     private _done: boolean;
@@ -101,7 +101,9 @@ export abstract class Operation<T> extends EventEmitter {
         if (this.isExecuting || this.isCancelled || this.isFinished) {
             return;
         }
-        this._queuePriority = value;
+        if (value in QueuePriority) {
+            this._queuePriority = value;
+        }
     }
 
     /**
@@ -218,9 +220,8 @@ export abstract class Operation<T> extends EventEmitter {
     }
 
     /**
-     * @protected
      */
-    protected main(): void {
+    public main(): void {
         this.isExecuting = true;
         this.emit(OperationEvent.START, this);
         this.runPromise = this.run()

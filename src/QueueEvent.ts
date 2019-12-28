@@ -2,12 +2,8 @@
 /**
  * Events fired from OperationQueue
  */
-enum QueueEvent {
-    DONE,
-    PAUSED,
-    RESUMED
+export enum QueueEvent {
+    DONE = 'done',
+    PAUSED = 'paused',
+    RESUMED = 'resumed'
 }
-
-module.exports = {
-    QueueEvent
-};

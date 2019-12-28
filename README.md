@@ -221,7 +221,7 @@ operationQueue.addOperations([operation1, operation2]);
 ### Utilizing OperationQueue's maximum concurrent operations
 
 ```javascript
-operationQueue.maximumConcurentOperations = 2;
+operationQueue.maximumConcurrentOperations = 2;
 ```
 
 Console:
@@ -291,7 +291,7 @@ operation5.dependencies = [blockOperation6];
 operation8.dependencies = [operation7];
 
 const operationQueue = new OperationQueue();
-operationQueue.maximumConcurentOperations = 10;
+operationQueue.maximumConcurrentOperations = 10;
 
 operationQueue.completionCallback = () => {
     console.log('queue done');
