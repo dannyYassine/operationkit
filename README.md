@@ -90,6 +90,16 @@ Console:
 // operation1 done
 ```
 
+#### Getting the result from dependent operations
+Add the property name as the second param for *addDependency*
+
+```javascript
+operation1.addDependency(operation2, 'data');
+await operation1.start()
+
+operation1.data === operation2.result;
+```
+
 ### Extend the Operation class for complex tasks
 
 ```javascript
