@@ -43,7 +43,7 @@ export class GroupOperation<U> extends Operation<any> {
     /**
      * @param {Operation} operation 
      */
-    addOperation(operation) {
+    addOperation(operation: Operation<any>) {
         this.operations.push(operation);
         this.dependencies = [];
     }
@@ -51,7 +51,7 @@ export class GroupOperation<U> extends Operation<any> {
     /**
      * @param {Array.<Operation>} operations
      */
-    addOperations(operations) {
+    addOperations(operations: Operation<any>[]) {
         this.operations = this.operations.concat(operations);
         this.dependencies = [];
     }

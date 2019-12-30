@@ -21,10 +21,10 @@ export declare class GroupOperation<U> extends Operation<any> {
     /**
      * @param {Operation} operation
      */
-    addOperation(operation: any): void;
+    addOperation(operation: Operation<any>): void;
     /**
      * @param {Array.<Operation>} operations
      */
-    addOperations(operations: any): void;
+    addOperations(operations: Operation<any>[]): void;
 }
 export {};
