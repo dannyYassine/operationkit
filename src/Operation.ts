@@ -31,6 +31,7 @@ export abstract class Operation<T> extends EventEmitter {
     private _resolve: Function;
     private _reject: Function;
     private _queuePriority: QueuePriority = QueuePriority.normal;
+    private _dependentResultMap: Map<string, string>;
 
     /**
      * @param {number} [id]
@@ -59,6 +60,7 @@ export abstract class Operation<T> extends EventEmitter {
 
         this._resolve = null;
         this._reject = null;
+        this._dependentResultMap = new Map();
     }
 
     /**
@@ -179,9 +181,13 @@ export abstract class Operation<T> extends EventEmitter {
     /**
      * Adds an operation as a dependency
      * @param {Operation} dependency 
+     * @param {string?} property
      */
-    public addDependency(dependency: Operation<any>): void {
+    public addDependency(dependency: Operation<any>, property?: string): void {
         this._dependencies.push(dependency);
+        if (property) {
+            this._dependentResultMap.set(dependency.id, property);
+        }
     }
 
     /**
@@ -261,10 +267,12 @@ export abstract class Operation<T> extends EventEmitter {
             operation.on(OperationEvent.DONE, this._onDependantOperationDone.bind(this));
             operation.start();
         });
-
     }
 
     private _onDependantOperationDone(operation): void {
+        if (this._dependentResultMap.has(operation.id)) {
+            this[this._dependentResultMap.get(operation.id)] = operation.result;
+        }
         delete this.map[operation.id];
         this._tryStart();
     }

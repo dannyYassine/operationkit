@@ -324,6 +324,17 @@ describe('Operation', () => {
             expect(operation1.dependencies.length).toBe(1);
             expect(operation1.dependencies[0].id).toBe(operation2.id);
         });
+
+        it('should append new property when dependency is done', async () => {
+            const operation1 = new TestOperation();
+            const operation2 = new TestOperation();
+
+            operation1.addDependency(operation2, 'test');
+            await operation1.start();
+            
+            expect(operation1.test).toBeDefined();
+            expect(operation1.test).toEqual(operation2.result);
+        })
     });
 
     describe('function removeDependency', () => {

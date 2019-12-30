@@ -22,9 +22,9 @@ commit_files() {
   git checkout master
   ls -al
   git status
-  git add dist/operationkit.min.js
-  git add dist/operationkit.min.js.map
-  git add scripts/_version.txt
+  cd dist
+  git add .
+  cd ..
   ls -al
   git status
   git commit --message "[travis-ci skip] Travis build: ${TRAVIS_BUILD_NUMBER}; Updating operationkit.min.js"
