@@ -19,7 +19,6 @@ const exec = util.promisify(require('child_process').exec);
         console.log('SUCCESS');
         process.exit(0);
     } catch (e) {
-
         console.log('ERROR');
         console.log(e);
         process.exit(1);
