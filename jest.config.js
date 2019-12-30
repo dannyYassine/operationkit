@@ -1,7 +1,7 @@
 module.exports = {
     moduleFileExtensions: ['js', 'jsx', 'json', 'vue', 'ts', 'tsx'],
     transform: {
-        "^.+\\.jsx?$": "babel-jest"
+        "^.+\\.ts?$": "ts-jest"
     },
     transformIgnorePatterns: ['/node_modules/'],
     moduleNameMapper: {

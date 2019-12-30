@@ -1,8 +1,10 @@
 docs
 coverage
 node_modules
+
 .vscode
 .temp
 .idea
-_config.yml
 .gitignore
+
+_config.yml

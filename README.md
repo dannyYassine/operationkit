@@ -221,7 +221,7 @@ operationQueue.addOperations([operation1, operation2]);
 ### Utilizing OperationQueue's maximum concurrent operations
 
 ```javascript
-operationQueue.maximumConcurentOperations = 2;
+operationQueue.maximumConcurrentOperations = 2;
 ```
 
 Console:
@@ -291,7 +291,7 @@ operation5.dependencies = [blockOperation6];
 operation8.dependencies = [operation7];
 
 const operationQueue = new OperationQueue();
-operationQueue.maximumConcurentOperations = 10;
+operationQueue.maximumConcurrentOperations = 10;
 
 operationQueue.completionCallback = () => {
     console.log('queue done');
@@ -318,16 +318,21 @@ queue.on(OperationEvent.PAUSED, (operationQueue) => {
 A helper class that accepts a function which will be exexuted as the operation's task.
 
 ```javascript
-const operation = new BlockOperation(async () => {
-    return new Promise((resolve, reject) => {
-            setTimeout(() => {
-                resolve('my operation result');
-            }, 1000);
-        })
+const operation = new BlockOperation(async (op) => {
+	const data = await api.get();
+	...
+	return data;
 });
 
 const result = await operation.start()
 console.log(result) // 'my operation result'
+```
+You have acces to the operation in the function:
+
+```javascript
+const operation = new BlockOperation(async (op) => {
+	console.log(op === operation);
+});
 ```
 
 ## GroupOperation

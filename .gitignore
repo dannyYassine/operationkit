@@ -3,5 +3,4 @@ coverage
 .coveralls.yml
 .idea
 .temp
-
 jsdocs
