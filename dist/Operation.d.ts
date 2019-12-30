@@ -24,6 +24,7 @@ export declare abstract class Operation<T> extends EventEmitter {
     private _resolve;
     private _reject;
     private _queuePriority;
+    private _dependentResultMap;
     /**
      * @param {number} [id]
      */
@@ -94,8 +95,9 @@ export declare abstract class Operation<T> extends EventEmitter {
     /**
      * Adds an operation as a dependency
      * @param {Operation} dependency
+     * @param {string?} property
      */
-    addDependency(dependency: Operation<any>): void;
+    addDependency(dependency: Operation<any>, property?: string): void;
     /**
      * Removes an operation as a dependency
      * @param {Operation} dependency
