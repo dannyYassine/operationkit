@@ -113,6 +113,32 @@ class ValidateTokenOperation extends Operation {
 }
 ```
 
+Now use it as a dependency for your API requests:
+
+```javascript
+class ApiRequestOperation extends Operation {
+    constructor() {
+        this.dependencies = [new ValidateTokenOperation()]
+    }
+}
+```
+
+You can now make all api requests of your app able to refresh the token by extending `ApiRequestOperation`
+
+```javascript
+class DownloadDataOperation extends ApiRequestOperation {
+
+    async run() {
+        try {
+            const response = await axios.get('<some_api>');
+            return response.data;
+        } catch (e) {
+            this.cancel();
+        }
+    }
+}
+```
+
 The `run` function must always return a **promise**.
 
 ```javascript
