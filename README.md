@@ -1,6 +1,6 @@
-<div style="position: relative;">
-<img height="250px" width="100%" style="object-fit: contain;" src="https://github.com/dannyYassine/operationkit/blob/master/assets/logo.png?raw=true" alt="logo.png">
-</div>
+<p align="center">
+<img height="250px" style="max-width:100%" src="https://github.com/dannyYassine/operationkit/blob/master/assets/logo.png?raw=true" alt="logo.png">
+</p>
 
 [![Version](https://img.shields.io/npm/v/operationkit.svg)](https://www.npmjs.com/package/operationkit)
 
